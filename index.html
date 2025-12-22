@@ -167,10 +167,24 @@
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .task-input-wrapper {
+            flex: 1 1 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-input-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
         .task-input {
-            flex: 1;
             padding: 14px 18px;
             border: 2px solid var(--border);
             border-radius: var(--radius-sm);
@@ -185,8 +199,20 @@
             box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
         }
 
-        .time-input {
-            width: 80px;
+        .intervals-wrapper {
+            flex: 0 1 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .intervals-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .intervals-input {
             padding: 14px;
             border: 2px solid var(--border);
             border-radius: var(--radius-sm);
@@ -205,6 +231,8 @@
             font-size: 15px;
             font-weight: 500;
             transition: all 0.2s;
+            height: 52px; /* одинаковая высота с полями ввода */
+            align-self: end;
         }
 
         .add-btn:hover {
@@ -219,6 +247,9 @@
             border: 1px solid rgba(58, 134, 255, 0.2);
             margin-bottom: 20px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .current-task.empty {
@@ -226,6 +257,18 @@
             border: 1px solid var(--border);
             color: var(--text-light);
             text-align: center;
+            display: block;
+        }
+
+        .task-intervals {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            background: rgba(58, 134, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-left: 10px;
+            white-space: nowrap;
         }
 
         .task-list {
@@ -301,7 +344,7 @@
             opacity: 0.7;
         }
 
-        .task-duration {
+        .task-intervals-badge {
             color: var(--primary);
             font-weight: 600;
             font-size: 14px;
@@ -310,6 +353,7 @@
             border-radius: 12px;
             min-width: 60px;
             text-align: center;
+            white-space: nowrap;
         }
 
         .task-actions {
@@ -725,9 +769,30 @@
             color: var(--text-light);
         }
 
-        /* Browser Notification */
-        .browser-notification {
-            display: none;
+        /* Task Progress */
+        .task-progress {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(58, 134, 255, 0.05);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(58, 134, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-progress-text {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .task-progress-count {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 16px;
+            background: rgba(58, 134, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 12px;
         }
 
         /* Local Notification */
@@ -789,25 +854,6 @@
             color: var(--text);
         }
 
-        /* Scrollbar */
-        .task-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .task-list::-webkit-scrollbar-track {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .task-list::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 3px;
-        }
-
-        .task-list::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-
         /* Responsive */
         @media (max-width: 540px) {
             .container {
@@ -846,6 +892,24 @@
                 flex-direction: column;
                 gap: 8px;
             }
+            
+            .task-input-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .task-input-wrapper,
+            .intervals-wrapper {
+                flex: 1 1 auto;
+            }
+            
+            .intervals-input {
+                width: 100%;
+            }
+            
+            .add-btn {
+                height: 52px;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -876,7 +940,6 @@
                 Фоновый звук
             </div>
             
-            <!-- Sound Category Buttons -->
             <div class="sound-category">
                 <div class="sound-category-title">
                     <i class="fas fa-headphones"></i>
@@ -910,7 +973,6 @@
                 </div>
             </div>
 
-            <!-- Track Controls -->
             <div class="sound-track-controls" id="trackControls">
                 <div class="track-info">
                     <div class="track-icon lofi-icon" id="trackIcon">
@@ -946,12 +1008,25 @@
             </div>
             
             <div class="task-input-container">
-                <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
-                <input type="number" class="time-input" id="taskMinutes" value="25" min="1" max="60">
+                <div class="task-input-wrapper">
+                    <label class="task-input-label">Название задачи</label>
+                    <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
+                </div>
+                <div class="intervals-wrapper">
+                    <label class="intervals-label">Количество интервалов</label>
+                    <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10">
+                </div>
                 <button class="add-btn" id="addTaskBtn">Добавить</button>
             </div>
             
             <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
+            
+            <div class="task-progress" id="taskProgress" style="display: none;">
+                <div class="task-progress-text">
+                    Интервалов выполнено: 
+                </div>
+                <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
+            </div>
             
             <div class="task-list" id="taskList">
                 <!-- Tasks will be added here -->
@@ -1028,64 +1103,26 @@
         </div>
     </div>
 
-    <!-- Hidden element for browser notifications -->
-    <div class="browser-notification" id="browserNotification"></div>
+    <!-- Audio elements -->
+    <audio id="lofi-track-1" loop><source src="sounds/lofi/lofi-1.mp3" type="audio/mpeg"></audio>
+    <audio id="lofi-track-2" loop><source src="sounds/lofi/lofi-2.mp3" type="audio/mpeg"></audio>
+    <audio id="lofi-track-3" loop><source src="sounds/lofi/lofi-3.mp3" type="audio/mpeg"></audio>
 
-    <!-- Audio elements - Multiple tracks for each category -->
-    <!-- Lofi tracks -->
-    <audio id="lofi-track-1" loop>
-        <source src="sounds/lofi/lofi-1.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="lofi-track-2" loop>
-        <source src="sounds/lofi/lofi-2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="lofi-track-3" loop>
-        <source src="sounds/lofi/lofi-3.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="fireplace-track-1" loop><source src="sounds/fireplace/fireplace-1.mp3" type="audio/mpeg"></audio>
+    <audio id="fireplace-track-2" loop><source src="sounds/fireplace/fireplace-2.mp3" type="audio/mpeg"></audio>
+    <audio id="fireplace-track-3" loop><source src="sounds/fireplace/fireplace-3.mp3" type="audio/mpeg"></audio>
 
-    <!-- Fireplace tracks -->
-    <audio id="fireplace-track-1" loop>
-        <source src="sounds/fireplace/fireplace-1.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="fireplace-track-2" loop>
-        <source src="sounds/fireplace/fireplace-2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="fireplace-track-3" loop>
-        <source src="sounds/fireplace/fireplace-3.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="snow-track-1" loop><source src="sounds/snow/snow-1.mp3" type="audio/mpeg"></audio>
+    <audio id="snow-track-2" loop><source src="sounds/snow/snow-2.mp3" type="audio/mpeg"></audio>
+    <audio id="snow-track-3" loop><source src="sounds/snow/snow-3.mp3" type="audio/mpeg"></audio>
 
-    <!-- Snow tracks -->
-    <audio id="snow-track-1" loop>
-        <source src="sounds/snow/snow-1.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="snow-track-2" loop>
-        <source src="sounds/snow/snow-2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="snow-track-3" loop>
-        <source src="sounds/snow/snow-3.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="storm-track-1" loop><source src="sounds/storm/storm-1.mp3" type="audio/mpeg"></audio>
+    <audio id="storm-track-2" loop><source src="sounds/storm/storm-2.mp3" type="audio/mpeg"></audio>
+    <audio id="storm-track-3" loop><source src="sounds/storm/storm-3.mp3" type="audio/mpeg"></audio>
 
-    <!-- Storm tracks -->
-    <audio id="storm-track-1" loop>
-        <source src="sounds/storm/storm-1.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="storm-track-2" loop>
-        <source src="sounds/storm/storm-2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="storm-track-3" loop>
-        <source src="sounds/storm/storm-3.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- New Year tracks -->
-    <audio id="newyear-track-1" loop>
-        <source src="sounds/newyear/newyear-1.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="newyear-track-2" loop>
-        <source src="sounds/newyear/newyear-2.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="newyear-track-3" loop>
-        <source src="sounds/newyear/newyear-3.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="newyear-track-1" loop><source src="sounds/newyear/newyear-1.mp3" type="audio/mpeg"></audio>
+    <audio id="newyear-track-2" loop><source src="sounds/newyear/newyear-2.mp3" type="audio/mpeg"></audio>
+    <audio id="newyear-track-3" loop><source src="sounds/newyear/newyear-3.mp3" type="audio/mpeg"></audio>
 
     <script>
         // Константы
@@ -1105,14 +1142,15 @@
         let tasks = [];
         let currentTaskIndex = -1;
         
-        // Звуковые настройки
+        let currentTaskIntervalsCompleted = 0;
+        let currentTaskTotalIntervals = 1;
+        
         let currentSoundCategory = 'lofi';
-        let currentTrackIndex = 1; // 1, 2 или 3
+        let currentTrackIndex = 1;
         const maxTracks = 3;
         let isSoundPlaying = false;
         let notificationPermission = false;
 
-        // Дополнительные звуковые треки для каждой категории
         const soundTracks = {
             lofi: ['Lofi 1', 'Lofi 2', 'Lofi 3'],
             fireplace: ['Камин 1', 'Камин 2', 'Камин 3'],
@@ -1149,28 +1187,27 @@
         const shortBreakInput = document.getElementById('shortBreakDuration');
         const longBreakInput = document.getElementById('longBreakDuration');
         const taskInput = document.getElementById('taskInput');
-        const taskMinutesInput = document.getElementById('taskMinutes');
+        const taskIntervalsInput = document.getElementById('taskIntervals');
         const addTaskBtn = document.getElementById('addTaskBtn');
         const taskListEl = document.getElementById('taskList');
         const currentTaskDisplay = document.getElementById('currentTaskDisplay');
         const completedSessionsEl = document.getElementById('completedSessions');
         const tasksCompletedEl = document.getElementById('tasksCompleted');
         const totalTimeEl = document.getElementById('totalTime');
+        const taskProgressEl = document.getElementById('taskProgress');
+        const completedIntervalsDisplay = document.getElementById('completedIntervalsDisplay');
         
-        // Элементы уведомлений
         const localNotification = document.getElementById('localNotification');
         const notificationTitle = document.getElementById('notificationTitle');
         const notificationMessage = document.getElementById('notificationMessage');
         const notificationStartBtn = document.getElementById('notificationStartBtn');
         const notificationLaterBtn = document.getElementById('notificationLaterBtn');
         
-        // Элементы настроек
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsModal = document.getElementById('settingsModal');
         const closeSettings = document.getElementById('closeSettings');
         const saveSettings = document.getElementById('saveSettings');
         
-        // Элементы звука
         const soundButtons = document.querySelectorAll('.sound-btn');
         const trackControls = document.getElementById('trackControls');
         const trackIcon = document.getElementById('trackIcon');
@@ -1188,12 +1225,10 @@
         updateTrackControls();
         updatePlayPauseButton();
 
-        // Автоматическое обновление времени при изменении настроек
         workDurationInput.addEventListener('input', updateTimerFromSettings);
         shortBreakInput.addEventListener('input', updateTimerFromSettings);
         longBreakInput.addEventListener('input', updateTimerFromSettings);
 
-        // Проверка разрешения на уведомления
         function checkNotificationPermission() {
             if ("Notification" in window) {
                 if (Notification.permission === "granted") {
@@ -1224,7 +1259,6 @@
             if (e.key === 'Enter') addTask();
         });
 
-        // Обработчики звуковых кнопок
         soundButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const sound = btn.dataset.sound;
@@ -1236,12 +1270,13 @@
         // Функции задач
         function addTask() {
             const taskText = taskInput.value.trim();
-            const duration = parseInt(taskMinutesInput.value) || 25;
+            const intervals = parseInt(taskIntervalsInput.value) || 1;
             
             if (taskText) {
                 const newTask = { 
                     text: taskText, 
-                    duration: duration,
+                    intervals: intervals,
+                    completedIntervals: 0,
                     completed: false,
                     id: Date.now()
                 };
@@ -1281,7 +1316,7 @@
                         <div class="task-text ${task.completed ? 'completed' : ''}">
                             ${task.text}
                         </div>
-                        <div class="task-duration">${task.duration} мин</div>
+                        <div class="task-intervals-badge">${task.completedIntervals}/${task.intervals}</div>
                     </div>
                     <div class="task-actions">
                         <button class="task-btn delete" onclick="deleteTask(${task.id})" title="Удалить">
@@ -1301,7 +1336,6 @@
             });
         }
 
-        // Глобальные функции для задач
         window.toggleTaskCompletion = function(taskId) {
             const taskIndex = tasks.findIndex(t => t.id === taskId);
             if (taskIndex !== -1) {
@@ -1343,6 +1377,7 @@
                         currentTaskIndex = -1;
                         currentTaskDisplay.textContent = 'Задача не выбрана';
                         currentTaskDisplay.classList.add('empty');
+                        taskProgressEl.style.display = 'none';
                     }
                 } else {
                     tasks.splice(taskIndex, 1);
@@ -1360,18 +1395,67 @@
             if (index < 0 || index >= tasks.length) return;
             
             currentTaskIndex = index;
-            currentTaskDisplay.textContent = tasks[index].text;
+            const task = tasks[index];
+            currentTaskDisplay.innerHTML = `
+                ${task.text}
+                <div class="task-intervals">${task.completedIntervals}/${task.intervals} интервалов</div>
+            `;
             currentTaskDisplay.classList.remove('empty');
+            
+            currentTaskIntervalsCompleted = task.completedIntervals;
+            currentTaskTotalIntervals = task.intervals;
+            updateTaskProgress();
+            taskProgressEl.style.display = 'flex';
             
             document.querySelectorAll('.task-item').forEach((item, i) => {
                 item.classList.toggle('active', i === index);
             });
             
             if (!isRunning && mode === WORK_MODE) {
-                secondsLeft = tasks[index].duration * 60;
+                secondsLeft = parseInt(workDurationInput.value) * 60;
                 initialSeconds = secondsLeft;
                 updateDisplay(secondsLeft);
                 updateProgressBar();
+            }
+        }
+
+        function updateTaskProgress() {
+            completedIntervalsDisplay.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+            
+            if (currentTaskIndex !== -1) {
+                tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
+                
+                const taskElements = document.querySelectorAll('.task-item');
+                if (taskElements[currentTaskIndex]) {
+                    const badge = taskElements[currentTaskIndex].querySelector('.task-intervals-badge');
+                    if (badge) {
+                        badge.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+                    }
+                }
+                
+                if (!currentTaskDisplay.classList.contains('empty')) {
+                    currentTaskDisplay.innerHTML = `
+                        ${tasks[currentTaskIndex].text}
+                        <div class="task-intervals">${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals} интервалов</div>
+                    `;
+                }
+                
+                if (currentTaskIntervalsCompleted >= currentTaskTotalIntervals) {
+                    tasks[currentTaskIndex].completed = true;
+                    tasksCompleted++;
+                    updateStats();
+                    renderTaskList();
+                    
+                    const nextIndex = findNextIncompleteTask();
+                    if (nextIndex !== -1) {
+                        selectTask(nextIndex);
+                    } else {
+                        currentTaskIndex = -1;
+                        currentTaskDisplay.textContent = 'Задача не выбрана';
+                        currentTaskDisplay.classList.add('empty');
+                        taskProgressEl.style.display = 'none';
+                    }
+                }
             }
         }
 
@@ -1385,17 +1469,10 @@
             return -1;
         }
 
-        // Обновление таймера из настроек
         function updateTimerFromSettings() {
             if (!isRunning) {
                 if (mode === WORK_MODE) {
-                    if (currentTaskIndex !== -1) {
-                        // Если есть выбранная задача, используем её время
-                        secondsLeft = tasks[currentTaskIndex].duration * 60;
-                    } else {
-                        // Иначе используем настройки
-                        secondsLeft = parseInt(workDurationInput.value) * 60;
-                    }
+                    secondsLeft = parseInt(workDurationInput.value) * 60;
                 } else if (mode === BREAK_SHORT_MODE) {
                     secondsLeft = parseInt(shortBreakInput.value) * 60;
                 } else if (mode === BREAK_LONG_MODE) {
@@ -1408,7 +1485,6 @@
             }
         }
 
-        // Функции таймера
         function startTimer() {
             if (tasks.length === 0) {
                 showNotification('Нет задач', 'Добавьте задачи перед началом работы');
@@ -1427,11 +1503,9 @@
             }
             
             if (!isRunning) {
-                if (mode === WORK_MODE && currentTaskIndex !== -1) {
-                    secondsLeft = tasks[currentTaskIndex].duration * 60;
-                    initialSeconds = secondsLeft;
-                    updateDisplay(secondsLeft);
-                }
+                secondsLeft = parseInt(workDurationInput.value) * 60;
+                initialSeconds = secondsLeft;
+                updateDisplay(secondsLeft);
                 
                 isRunning = true;
                 clearInterval(timerInterval);
@@ -1440,7 +1514,6 @@
                 startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> В процессе';
                 startBtn.disabled = true;
                 
-                // Автозапуск звука при старте таймера
                 if (currentSoundCategory !== 'none' && !isSoundPlaying) {
                     playSound();
                 }
@@ -1460,8 +1533,8 @@
         function resetTimer() {
             pauseTimer();
             
-            if (mode === WORK_MODE && currentTaskIndex !== -1) {
-                secondsLeft = tasks[currentTaskIndex].duration * 60;
+            if (mode === WORK_MODE) {
+                secondsLeft = parseInt(workDurationInput.value) * 60;
                 initialSeconds = secondsLeft;
             } else {
                 setInitialTimeForCurrentMode();
@@ -1499,29 +1572,24 @@
             
             if (mode === WORK_MODE) {
                 sessionsCompleted++;
-                if (currentTaskIndex !== -1) {
-                    tasks[currentTaskIndex].completed = true;
-                }
-                tasksCompleted++;
-                updateStats();
+                currentTaskIntervalsCompleted++;
+                updateTaskProgress();
                 
-                // Останавливаем звук при завершении работы
                 if (isSoundPlaying) {
                     pauseSound();
                 }
                 
-                // Определяем тип перерыва
                 if (sessionsCompleted % 4 === 0) {
                     showNotification(
                         'Длинный перерыв',
-                        `Задача завершена. Отдохните ${longBreakInput.value} минут.`,
+                        `Интервал завершен. Выполнено ${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals} интервалов. Отдохните ${longBreakInput.value} минут.`,
                         'break'
                     );
                     setTimeout(() => switchToMode(BREAK_LONG_MODE), 100);
                 } else {
                     showNotification(
                         'Короткий перерыв',
-                        `Задача завершена. Отдохните ${shortBreakInput.value} минут.`,
+                        `Интервал завершен. Выполнено ${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals} интервалов. Отдохните ${shortBreakInput.value} минут.`,
                         'break'
                     );
                     setTimeout(() => switchToMode(BREAK_SHORT_MODE), 100);
@@ -1530,7 +1598,7 @@
             } else {
                 showNotification(
                     'Время работать',
-                    'Перерыв окончен. Выберите следующую задачу.',
+                    'Перерыв окончен. Продолжайте работу над задачей.',
                     'work'
                 );
                 switchToMode(WORK_MODE);
@@ -1538,9 +1606,6 @@
             
             startBtn.innerHTML = '<i class="fas fa-play"></i> Старт';
             startBtn.disabled = false;
-            
-            // Обновляем список задач
-            renderTaskList();
         }
 
         function switchToMode(newMode) {
@@ -1553,31 +1618,24 @@
 
         function setInitialTimeForCurrentMode() {
             if (mode === WORK_MODE) {
-                if (currentTaskIndex !== -1 && !isRunning) {
-                    initialSeconds = tasks[currentTaskIndex].duration * 60;
-                    secondsLeft = initialSeconds;
-                } else {
-                    initialSeconds = parseInt(workDurationInput.value) * 60;
-                    secondsLeft = initialSeconds;
-                }
+                secondsLeft = parseInt(workDurationInput.value) * 60;
+                initialSeconds = secondsLeft;
             } else if (mode === BREAK_SHORT_MODE) {
-                initialSeconds = parseInt(shortBreakInput.value) * 60;
-                secondsLeft = initialSeconds;
+                secondsLeft = parseInt(shortBreakInput.value) * 60;
+                initialSeconds = secondsLeft;
             } else if (mode === BREAK_LONG_MODE) {
-                initialSeconds = parseInt(longBreakInput.value) * 60;
-                secondsLeft = initialSeconds;
+                secondsLeft = parseInt(longBreakInput.value) * 60;
+                initialSeconds = secondsLeft;
             }
         }
 
-        // Управление звуком
         function setSoundCategory(sound) {
             currentSoundCategory = sound;
-            currentTrackIndex = 1; // Сбрасываем на первый трек при смене категории
+            currentTrackIndex = 1;
             
             updateSoundButtons();
             updateTrackControls();
             
-            // Останавливаем все звуки
             stopAllSounds();
             isSoundPlaying = false;
             updatePlayPauseButton();
@@ -1602,7 +1660,6 @@
                 return;
             }
             
-            // Останавливаем все звуки перед воспроизведением нового
             stopAllSounds();
             
             const audioId = `${currentSoundCategory}-track-${currentTrackIndex}`;
@@ -1625,7 +1682,6 @@
         }
 
         function stopAllSounds() {
-            // Останавливаем все аудио элементы
             const allAudio = document.querySelectorAll('audio');
             allAudio.forEach(audio => {
                 audio.pause();
@@ -1676,7 +1732,6 @@
             }
             updateTrackControls();
             
-            // Если звук был включен, воспроизводим новый трек
             if (isSoundPlaying) {
                 playCurrentTrack();
             }
@@ -1691,7 +1746,6 @@
             }
             updateTrackControls();
             
-            // Если звук был включен, воспроизводим новый трек
             if (isSoundPlaying) {
                 playCurrentTrack();
             }
@@ -1729,7 +1783,6 @@
             trackVariant.textContent = soundTracks[currentSoundCategory][currentTrackIndex - 1];
             trackNumber.textContent = `${currentTrackIndex}/${maxTracks}`;
             
-            // Обновляем иконку
             const iconClass = soundColors[currentSoundCategory];
             trackIcon.className = `track-icon ${iconClass}`;
             trackIcon.innerHTML = `<i class="fas fa-${soundIcons[currentSoundCategory]}"></i>`;
@@ -1752,7 +1805,6 @@
         }
 
         function playBeep() {
-            // Простой бип для уведомлений
             try {
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
@@ -1774,19 +1826,13 @@
             }
         }
 
-        // Уведомления
         function showNotification(title, message, type = 'info') {
-            console.log('Показ уведомления:', title, message);
-            
-            // 1. Показываем локальное уведомление (всегда работает)
             showLocalNotification(title, message);
             
-            // 2. Показываем браузерное уведомление (если разрешено)
             if (notificationPermission) {
                 showBrowserNotification(title, message);
             }
             
-            // 3. Проигрываем звук уведомления
             playBeep();
             
             if (type === 'break') {
@@ -1801,7 +1847,6 @@
             notificationMessage.textContent = message;
             localNotification.classList.add('show');
             
-            // Автоматически скрываем через 10 секунд
             setTimeout(() => {
                 if (localNotification.classList.contains('show')) {
                     hideLocalNotification();
@@ -1821,7 +1866,7 @@
                     body: message,
                     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233A86FF"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
                     tag: 'pomodoro-timer',
-                    requireInteraction: true // Окно не будет закрываться автоматически
+                    requireInteraction: true
                 });
                 
                 notification.onclick = function() {
@@ -1835,22 +1880,15 @@
             hideLocalNotification();
             
             if (mode === WORK_MODE) {
-                const nextIndex = findNextIncompleteTask();
-                if (nextIndex !== -1) {
-                    selectTask(nextIndex);
-                }
                 startTimer();
             }
         }
 
-        // Настройки
         function saveSettingsHandler() {
             settingsModal.classList.remove('active');
-            // Применяем настройки
             updateTimerFromSettings();
         }
 
-        // Вспомогательные функции
         function updateDisplay(seconds) {
             const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
             const secs = (seconds % 60).toString().padStart(2, '0');
