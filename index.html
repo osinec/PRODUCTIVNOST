@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OSINEC TIMER</title>
+    <title>🍅 Minimal Timer</title>
     <style>
         :root {
             --primary: #3A86FF;
@@ -38,7 +38,8 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            overflow-y: auto;
         }
 
         .container {
@@ -47,9 +48,10 @@
             background: var(--card);
             border-radius: var(--radius);
             box-shadow: var(--shadow-lg);
-            padding: 30px;
+            padding: 30px 25px;
             position: relative;
             border: 1px solid var(--border);
+            margin: 0 auto;
         }
 
         .header {
@@ -68,7 +70,7 @@
 
         .header p {
             color: var(--text-light);
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .settings-btn {
@@ -86,6 +88,7 @@
             cursor: pointer;
             color: var(--text-light);
             transition: all 0.2s;
+            font-size: 14px;
         }
 
         .settings-btn:hover {
@@ -101,7 +104,7 @@
 
         .timer-display {
             font-family: 'SF Mono', 'Roboto Mono', monospace;
-            font-size: 64px;
+            font-size: 60px;
             font-weight: 300;
             text-align: center;
             margin: 15px 0;
@@ -144,61 +147,7 @@
             color: var(--secondary);
         }
 
-        /* Controls Section */
-        .controls-section {
-            margin-bottom: 25px;
-        }
-
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .control-btn {
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .control-btn.start {
-            background: var(--primary);
-            color: white;
-        }
-
-        .control-btn.start:hover {
-            background: var(--primary-dark);
-        }
-
-        .control-btn.pause {
-            background: rgba(113, 128, 150, 0.1);
-            color: var(--text);
-        }
-
-        .control-btn.pause:hover {
-            background: rgba(113, 128, 150, 0.2);
-        }
-
-        .control-btn.reset {
-            background: none;
-            color: var(--text);
-            border: 2px solid var(--border);
-        }
-
-        .control-btn.reset:hover {
-            border-color: var(--text-light);
-        }
-
-        /* Tasks Section */
+        /* Tasks */
         .tasks-section {
             margin-bottom: 25px;
         }
@@ -215,36 +164,25 @@
 
         .section-title i {
             color: var(--primary);
+            font-size: 14px;
         }
 
         .task-input-container {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
-            align-items: end;
-            flex-wrap: wrap;
-        }
-
-        .task-input-wrapper {
-            flex: 1 1 200px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .task-input-label {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-bottom: 4px;
-            font-weight: 500;
+            align-items: flex-end;
         }
 
         .task-input {
-            padding: 12px 14px;
+            flex: 1;
+            padding: 12px 15px;
             border: 2px solid var(--border);
             border-radius: var(--radius-sm);
             font-size: 14px;
             transition: all 0.2s;
             background: var(--card);
+            min-width: 0;
         }
 
         .task-input:focus {
@@ -253,27 +191,37 @@
             box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
         }
 
-        .intervals-wrapper {
-            flex: 0 1 80px;
+        .intervals-container {
             display: flex;
             flex-direction: column;
+            width: 100px;
+            flex-shrink: 0;
         }
 
         .intervals-label {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-light);
             margin-bottom: 4px;
             font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
         }
 
         .intervals-input {
+            width: 100%;
             padding: 12px;
             border: 2px solid var(--border);
             border-radius: var(--radius-sm);
             text-align: center;
             font-size: 14px;
             background: var(--card);
-            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .intervals-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
         }
 
         .add-btn {
@@ -286,8 +234,8 @@
             font-size: 14px;
             font-weight: 500;
             transition: all 0.2s;
-            height: 46px;
-            align-self: end;
+            height: 44px;
+            flex-shrink: 0;
             white-space: nowrap;
         }
 
@@ -315,6 +263,7 @@
             color: var(--text-light);
             text-align: center;
             display: block;
+            padding: 12px;
         }
 
         .task-intervals {
@@ -329,14 +278,14 @@
         }
 
         .task-list {
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border);
         }
 
         .task-item {
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -388,12 +337,17 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .task-text {
             flex: 1;
             font-weight: 500;
             font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .task-text.completed {
@@ -412,6 +366,7 @@
             min-width: 50px;
             text-align: center;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .task-actions {
@@ -419,6 +374,7 @@
             gap: 6px;
             opacity: 0;
             transition: opacity 0.2s;
+            flex-shrink: 0;
         }
 
         .task-item:hover .task-actions {
@@ -437,6 +393,7 @@
             background: none;
             color: var(--text-light);
             transition: all 0.2s;
+            font-size: 12px;
         }
 
         .task-btn:hover {
@@ -448,7 +405,7 @@
             background: rgba(255, 0, 110, 0.1);
         }
 
-        /* Sound Controls */
+        /* Sound Controls - упрощено */
         .sound-controls {
             margin: 20px 0;
             background: rgba(58, 134, 255, 0.03);
@@ -462,20 +419,6 @@
             font-weight: 600;
             margin-bottom: 12px;
             color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .sound-category {
-            margin-bottom: 15px;
-        }
-
-        .sound-category-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-light);
-            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -498,10 +441,13 @@
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            font-size: 13px;
+            gap: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            min-height: 70px;
         }
 
         .sound-btn:hover {
@@ -515,116 +461,59 @@
             border-color: var(--primary);
         }
 
-        .sound-track-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 12px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
+        .sound-btn i {
+            font-size: 18px;
+            margin-bottom: 4px;
         }
 
-        .track-info {
-            display: flex;
-            align-items: center;
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
+            margin: 25px 0 20px 0;
         }
 
-        .track-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            color: white;
-        }
-
-        .lofi-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
-        .fireplace-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .snow-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .storm-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .newyear-icon { background: linear-gradient(135deg, #fa709a, #fee140); }
-
-        .track-details {
-            flex: 1;
-        }
-
-        .track-name {
-            font-weight: 600;
-            color: var(--text);
+        .control-btn {
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
             font-size: 14px;
-        }
-
-        .track-variant {
-            font-size: 12px;
-            color: var(--text-light);
-            margin-top: 2px;
-        }
-
-        .track-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .track-play-pause {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            background: var(--primary);
-            color: white;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .track-play-pause:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
-        }
-
-        .track-play-pause.paused {
-            background: var(--success);
-        }
-
-        .track-nav {
-            display: flex;
-            align-items: center;
             gap: 6px;
         }
 
-        .track-nav-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+        .control-btn.start {
+            background: var(--primary);
+            color: white;
+        }
+
+        .control-btn.start:hover {
+            background: var(--primary-dark);
+        }
+
+        .control-btn.pause {
+            background: rgba(113, 128, 150, 0.1);
+            color: var(--text);
+        }
+
+        .control-btn.pause:hover {
+            background: rgba(113, 128, 150, 0.2);
+        }
+
+        .control-btn.reset {
+            background: none;
+            color: var(--text);
             border: 2px solid var(--border);
-            background: var(--card);
-            color: var(--text-light);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
 
-        .track-nav-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .track-number {
-            font-size: 13px;
-            color: var(--text-light);
-            min-width: 36px;
-            text-align: center;
+        .control-btn.reset:hover {
+            border-color: var(--text-light);
         }
 
         /* Stats */
@@ -632,8 +521,8 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            margin: 25px 0;
-            padding: 15px;
+            margin: 20px 0;
+            padding: 16px;
             background: rgba(58, 134, 255, 0.03);
             border-radius: var(--radius-sm);
         }
@@ -646,12 +535,38 @@
             font-size: 20px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .stat-label {
             font-size: 12px;
             color: var(--text-light);
+        }
+
+        /* Task Progress */
+        .task-progress {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(58, 134, 255, 0.05);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(58, 134, 255, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .task-progress-text {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .task-progress-count {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            background: rgba(58, 134, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
         }
 
         /* Settings Modal */
@@ -681,7 +596,7 @@
             border-radius: var(--radius);
             padding: 30px;
             width: 90%;
-            max-width: 400px;
+            max-width: 350px;
             transform: translateY(20px);
             transition: transform 0.3s;
             box-shadow: var(--shadow-lg);
@@ -807,7 +722,8 @@
         .notification-message {
             font-size: 13px;
             color: var(--text-light);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            line-height: 1.4;
         }
 
         .notification-buttons {
@@ -836,17 +752,42 @@
             color: var(--text);
         }
 
+        /* Scrollbar */
+        .task-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .task-list::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 2px;
+        }
+
+        .task-list::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
         /* Responsive */
         @media (max-width: 540px) {
+            body {
+                padding: 15px;
+                align-items: flex-start;
+            }
+            
             .container {
-                padding: 20px;
+                padding: 25px 20px;
+                max-width: 100%;
             }
             
             .timer-display {
                 font-size: 52px;
             }
             
-            .controls-grid {
+            .controls {
                 grid-template-columns: 1fr;
             }
             
@@ -862,44 +803,42 @@
             .stats {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 12px;
-                padding: 12px;
+                padding: 14px;
             }
             
             .local-notification {
-                width: calc(100% - 40px);
-                right: 20px;
-            }
-            
-            .track-controls {
-                flex-direction: column;
-                gap: 6px;
+                width: calc(100% - 30px);
+                right: 15px;
+                top: 15px;
+                padding: 14px;
             }
             
             .task-input-container {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 12px;
             }
             
-            .task-input-wrapper,
-            .intervals-wrapper {
-                flex: 1 1 auto;
-            }
-            
-            .intervals-input {
+            .intervals-container {
                 width: 100%;
             }
             
             .add-btn {
-                height: 46px;
                 width: 100%;
             }
             
-            .setting-input {
-                padding: 12px;
+            .sound-btn {
+                font-size: 11px;
+                padding: 8px;
+                min-height: 60px;
             }
         }
-        
-        @media (max-width: 400px) {
+
+        @media (max-width: 380px) {
+            .container {
+                padding: 20px 16px;
+            }
+            
             .timer-display {
                 font-size: 48px;
             }
@@ -908,8 +847,22 @@
                 grid-template-columns: 1fr;
             }
             
-            .settings-grid {
-                grid-template-columns: 1fr;
+            .task-item {
+                padding: 12px 14px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 18px;
+            }
+            
+            .sound-title, .section-title {
+                font-size: 14px;
             }
         }
     </style>
@@ -918,7 +871,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Just Focusr</h1>
+            <h1>Minimal Timer</h1>
             <p>Сфокусируйтесь на важном</p>
             <button class="settings-btn" id="settingsBtn">
                 <i class="fas fa-cog"></i>
@@ -934,50 +887,6 @@
             <div class="mode-indicator" id="modeIndicator">Работа</div>
         </div>
 
-        <!-- Controls Section -->
-        <div class="controls-section">
-            <div class="controls-grid">
-                <button class="control-btn start" id="startBtn">
-                    <i class="fas fa-play"></i>
-                    Старт
-                </button>
-                <button class="control-btn pause" id="pauseBtn">
-                    <i class="fas fa-pause"></i>
-                    Пауза
-                </button>
-                <button class="control-btn reset" id="resetBtn">
-                    <i class="fas fa-redo"></i>
-                    Сброс
-                </button>
-            </div>
-        </div>
-
-        <!-- Tasks Section -->
-        <div class="tasks-section">
-            <div class="section-title">
-                <i class="fas fa-tasks"></i>
-                Задачи
-            </div>
-            
-            <div class="task-input-container">
-                <div class="task-input-wrapper">
-                    <label class="task-input-label">Название задачи</label>
-                    <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
-                </div>
-                <div class="intervals-wrapper">
-                    <label class="intervals-label">Интервалов</label>
-                    <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10">
-                </div>
-                <button class="add-btn" id="addTaskBtn">Добавить</button>
-            </div>
-            
-            <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
-            
-            <div class="task-list" id="taskList">
-                <!-- Tasks will be added here -->
-            </div>
-        </div>
-
         <!-- Sound Controls -->
         <div class="sound-controls">
             <div class="sound-title">
@@ -985,63 +894,63 @@
                 Фоновый звук
             </div>
             
-            <div class="sound-category">
-                <div class="sound-category-title">
+            <!-- Sound Buttons - только один вариант каждого типа -->
+            <div class="sound-buttons" id="soundButtons">
+                <button class="sound-btn" data-sound="lofi">
                     <i class="fas fa-headphones"></i>
-                    Выберите категорию
-                </div>
-                <div class="sound-buttons" id="soundButtons">
-                    <button class="sound-btn" data-sound="lofi">
-                        <i class="fas fa-headphones"></i>
-                        Lofi
-                    </button>
-                    <button class="sound-btn" data-sound="fireplace">
-                        <i class="fas fa-fire"></i>
-                        Камин
-                    </button>
-                    <button class="sound-btn" data-sound="snow">
-                        <i class="fas fa-snowflake"></i>
-                        Снег
-                    </button>
-                    <button class="sound-btn" data-sound="storm">
-                        <i class="fas fa-wind"></i>
-                        Ураган
-                    </button>
-                    <button class="sound-btn" data-sound="newyear">
-                        <i class="fas fa-gift"></i>
-                        Новый год
-                    </button>
-                    <button class="sound-btn" data-sound="none">
-                        <i class="fas fa-volume-mute"></i>
-                        Без звука
-                    </button>
-                </div>
+                    Lofi
+                </button>
+                <button class="sound-btn" data-sound="fireplace">
+                    <i class="fas fa-fire"></i>
+                    Камин
+                </button>
+                <button class="sound-btn" data-sound="rain">
+                    <i class="fas fa-cloud-rain"></i>
+                    Дождь
+                </button>
+                <button class="sound-btn" data-sound="waves">
+                    <i class="fas fa-water"></i>
+                    Океан
+                </button>
+                <button class="sound-btn" data-sound="forest">
+                    <i class="fas fa-tree"></i>
+                    Лес
+                </button>
+                <button class="sound-btn active" data-sound="none">
+                    <i class="fas fa-volume-mute"></i>
+                    Без звука
+                </button>
             </div>
+        </div>
 
-            <div class="sound-track-controls" id="trackControls">
-                <div class="track-info">
-                    <div class="track-icon lofi-icon" id="trackIcon">
-                        <i class="fas fa-headphones"></i>
-                    </div>
-                    <div class="track-details">
-                        <div class="track-name" id="trackName">Lofi</div>
-                        <div class="track-variant" id="trackVariant">Трек 1</div>
-                    </div>
+        <!-- Tasks -->
+        <div class="tasks-section">
+            <div class="section-title">
+                <i class="fas fa-tasks"></i>
+                Задачи
+            </div>
+            
+            <div class="task-input-container">
+                <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
+                <div class="intervals-container">
+                    <div class="intervals-label">Кол-во интервалов</div>
+                    <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10" title="Количество помидорок (интервалов) для задачи">
                 </div>
-                <div class="track-controls">
-                    <button class="track-play-pause" id="playPauseBtn">
-                        <i class="fas fa-play"></i>
-                    </button>
-                    <div class="track-nav">
-                        <button class="track-nav-btn" id="prevTrack">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="track-number" id="trackNumber">1/3</div>
-                        <button class="track-nav-btn" id="nextTrack">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
+                <button class="add-btn" id="addTaskBtn">+</button>
+            </div>
+            
+            <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
+            
+            <!-- Task Progress -->
+            <div class="task-progress" id="taskProgress" style="display: none;">
+                <div class="task-progress-text">
+                    Интервалов выполнено: 
                 </div>
+                <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
+            </div>
+            
+            <div class="task-list" id="taskList">
+                <!-- Tasks will be added here -->
             </div>
         </div>
 
@@ -1060,32 +969,48 @@
                 <div class="stat-label">Задачи</div>
             </div>
         </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn start" id="startBtn">
+                <i class="fas fa-play"></i>
+                Старт
+            </button>
+            <button class="control-btn pause" id="pauseBtn">
+                <i class="fas fa-pause"></i>
+                Пауза
+            </button>
+            <button class="control-btn reset" id="resetBtn">
+                <i class="fas fa-redo"></i>
+                Сброс
+            </button>
+        </div>
     </div>
 
     <!-- Settings Modal -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-content">
             <div class="settings-header">
-                <h2>Настройки таймера</h2>
+                <h2>Настройки</h2>
                 <button class="close-btn" id="closeSettings">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="settings-grid">
                 <div class="setting-item">
-                    <label class="setting-label">Работа (мин)</label>
+                    <label class="setting-label">Работа</label>
                     <input type="number" class="setting-input" id="workDuration" value="25" min="1" max="60">
                 </div>
                 <div class="setting-item">
-                    <label class="setting-label">Короткий перерыв (мин)</label>
+                    <label class="setting-label">Короткий перерыв</label>
                     <input type="number" class="setting-input" id="shortBreakDuration" value="5" min="1" max="30">
                 </div>
                 <div class="setting-item">
-                    <label class="setting-label">Длинный перерыв (мин)</label>
+                    <label class="setting-label">Длинный перерыв</label>
                     <input type="number" class="setting-input" id="longBreakDuration" value="15" min="1" max="60">
                 </div>
             </div>
-            <button class="settings-save" id="saveSettings">Сохранить настройки</button>
+            <button class="settings-save" id="saveSettings">Сохранить</button>
         </div>
     </div>
 
@@ -1099,26 +1024,25 @@
         </div>
     </div>
 
-    <!-- Audio elements -->
-    <audio id="lofi-track-1" loop><source src="sounds/lofi/lofi-1.mp3" type="audio/mpeg"></audio>
-    <audio id="lofi-track-2" loop><source src="sounds/lofi/lofi-2.mp3" type="audio/mpeg"></audio>
-    <audio id="lofi-track-3" loop><source src="sounds/lofi/lofi-3.mp3" type="audio/mpeg"></audio>
+    <!-- Hidden element for browser notifications -->
+    <div class="browser-notification" id="browserNotification"></div>
 
-    <audio id="fireplace-track-1" loop><source src="sounds/fireplace/fireplace-1.mp3" type="audio/mpeg"></audio>
-    <audio id="fireplace-track-2" loop><source src="sounds/fireplace/fireplace-2.mp3" type="audio/mpeg"></audio>
-    <audio id="fireplace-track-3" loop><source src="sounds/fireplace/fireplace-3.mp3" type="audio/mpeg"></audio>
-
-    <audio id="snow-track-1" loop><source src="sounds/snow/snow-1.mp3" type="audio/mpeg"></audio>
-    <audio id="snow-track-2" loop><source src="sounds/snow/snow-2.mp3" type="audio/mpeg"></audio>
-    <audio id="snow-track-3" loop><source src="sounds/snow/snow-3.mp3" type="audio/mpeg"></audio>
-
-    <audio id="storm-track-1" loop><source src="sounds/storm/storm-1.mp3" type="audio/mpeg"></audio>
-    <audio id="storm-track-2" loop><source src="sounds/storm/storm-2.mp3" type="audio/mpeg"></audio>
-    <audio id="storm-track-3" loop><source src="sounds/storm/storm-3.mp3" type="audio/mpeg"></audio>
-
-    <audio id="newyear-track-1" loop><source src="sounds/newyear/newyear-1.mp3" type="audio/mpeg"></audio>
-    <audio id="newyear-track-2" loop><source src="sounds/newyear/newyear-2.mp3" type="audio/mpeg"></audio>
-    <audio id="newyear-track-3" loop><source src="sounds/newyear/newyear-3.mp3" type="audio/mpeg"></audio>
+    <!-- Audio elements - только один трек для каждого типа -->
+    <audio id="lofi-track" loop>
+        <source src="lofi.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="fireplace-track" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-crackling-fireplace-1190.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="rain-track" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-rain-loop-1244.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="waves-track" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-ocean-waves-loop-1246.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="forest-track" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-forest-with-birds-1235.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         // Константы
@@ -1138,39 +1062,14 @@
         let tasks = [];
         let currentTaskIndex = -1;
         
+        // Текущий прогресс задачи
         let currentTaskIntervalsCompleted = 0;
         let currentTaskTotalIntervals = 1;
         
-        let currentSoundCategory = 'lofi';
-        let currentTrackIndex = 1;
-        const maxTracks = 3;
+        // Звуковые настройки
+        let currentSoundCategory = 'none'; // По умолчанию без звука
         let isSoundPlaying = false;
         let notificationPermission = false;
-
-        const soundTracks = {
-            lofi: ['Трек 1', 'Трек 2', 'Трек 3'],
-            fireplace: ['Трек 1', 'Трек 2', 'Трек 3'],
-            snow: ['Трек 1', 'Трек 2', 'Трек 3'],
-            storm: ['Трек 1', 'Трек 2', 'Трек 3'],
-            newyear: ['Трек 1', 'Трек 2', 'Трек 3']
-        };
-
-        const soundIcons = {
-            lofi: 'headphones',
-            fireplace: 'fire',
-            snow: 'snowflake',
-            storm: 'wind',
-            newyear: 'gift',
-            none: 'volume-mute'
-        };
-
-        const soundColors = {
-            lofi: 'lofi-icon',
-            fireplace: 'fireplace-icon',
-            snow: 'snow-icon',
-            storm: 'storm-icon',
-            newyear: 'newyear-icon'
-        };
 
         // DOM элементы
         const displayEl = document.getElementById('display');
@@ -1190,39 +1089,35 @@
         const completedSessionsEl = document.getElementById('completedSessions');
         const tasksCompletedEl = document.getElementById('tasksCompleted');
         const totalTimeEl = document.getElementById('totalTime');
+        const taskProgressEl = document.getElementById('taskProgress');
+        const completedIntervalsDisplay = document.getElementById('completedIntervalsDisplay');
         
+        // Элементы уведомлений
         const localNotification = document.getElementById('localNotification');
         const notificationTitle = document.getElementById('notificationTitle');
         const notificationMessage = document.getElementById('notificationMessage');
         const notificationStartBtn = document.getElementById('notificationStartBtn');
         const notificationLaterBtn = document.getElementById('notificationLaterBtn');
         
+        // Элементы настроек
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsModal = document.getElementById('settingsModal');
         const closeSettings = document.getElementById('closeSettings');
         const saveSettings = document.getElementById('saveSettings');
         
+        // Элементы звука
         const soundButtons = document.querySelectorAll('.sound-btn');
-        const trackControls = document.getElementById('trackControls');
-        const trackIcon = document.getElementById('trackIcon');
-        const trackName = document.getElementById('trackName');
-        const trackVariant = document.getElementById('trackVariant');
-        const trackNumber = document.getElementById('trackNumber');
-        const prevTrackBtn = document.getElementById('prevTrack');
-        const nextTrackBtn = document.getElementById('nextTrack');
-        const playPauseBtn = document.getElementById('playPauseBtn');
 
         // Инициализация
         updateDisplay(secondsLeft);
-        updateSoundButtons();
         checkNotificationPermission();
-        updateTrackControls();
-        updatePlayPauseButton();
 
+        // Автоматическое обновление времени при изменении настроек
         workDurationInput.addEventListener('input', updateTimerFromSettings);
         shortBreakInput.addEventListener('input', updateTimerFromSettings);
         longBreakInput.addEventListener('input', updateTimerFromSettings);
 
+        // Проверка разрешения на уведомления
         function checkNotificationPermission() {
             if ("Notification" in window) {
                 if (Notification.permission === "granted") {
@@ -1245,19 +1140,20 @@
         settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
         closeSettings.addEventListener('click', () => settingsModal.classList.remove('active'));
         saveSettings.addEventListener('click', saveSettingsHandler);
-        prevTrackBtn.addEventListener('click', prevTrack);
-        nextTrackBtn.addEventListener('click', nextTrack);
-        playPauseBtn.addEventListener('click', toggleSound);
         
         taskInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addTask();
         });
 
+        // Обработчики звуковых кнопок
         soundButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const sound = btn.dataset.sound;
                 setSoundCategory(sound);
-                updatePlayPauseButton();
+                
+                // Обновляем активную кнопку
+                soundButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
             });
         });
 
@@ -1291,8 +1187,8 @@
             
             if (tasks.length === 0) {
                 taskListEl.innerHTML = `
-                    <div style="padding: 30px; text-align: center; color: var(--text-light);">
-                        <i class="fas fa-tasks" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>
+                    <div style="padding: 40px; text-align: center; color: var(--text-light);">
+                        <i class="fas fa-tasks" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
                         Нет задач. Добавьте первую!
                     </div>
                 `;
@@ -1330,6 +1226,7 @@
             });
         }
 
+        // Глобальные функции для задач
         window.toggleTaskCompletion = function(taskId) {
             const taskIndex = tasks.findIndex(t => t.id === taskId);
             if (taskIndex !== -1) {
@@ -1371,6 +1268,7 @@
                         currentTaskIndex = -1;
                         currentTaskDisplay.textContent = 'Задача не выбрана';
                         currentTaskDisplay.classList.add('empty');
+                        taskProgressEl.style.display = 'none';
                     }
                 } else {
                     tasks.splice(taskIndex, 1);
@@ -1395,14 +1293,18 @@
             `;
             currentTaskDisplay.classList.remove('empty');
             
+            // Обновляем прогресс задачи
             currentTaskIntervalsCompleted = task.completedIntervals;
             currentTaskTotalIntervals = task.intervals;
+            updateTaskProgress();
+            taskProgressEl.style.display = 'flex';
             
             document.querySelectorAll('.task-item').forEach((item, i) => {
                 item.classList.toggle('active', i === index);
             });
             
             if (!isRunning && mode === WORK_MODE) {
+                // Сбрасываем таймер при выборе новой задачи
                 secondsLeft = parseInt(workDurationInput.value) * 60;
                 initialSeconds = secondsLeft;
                 updateDisplay(secondsLeft);
@@ -1411,9 +1313,12 @@
         }
 
         function updateTaskProgress() {
+            completedIntervalsDisplay.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+            
             if (currentTaskIndex !== -1) {
                 tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
                 
+                // Обновляем отображение задачи
                 const taskElements = document.querySelectorAll('.task-item');
                 if (taskElements[currentTaskIndex]) {
                     const badge = taskElements[currentTaskIndex].querySelector('.task-intervals-badge');
@@ -1422,6 +1327,7 @@
                     }
                 }
                 
+                // Обновляем текущую задачу вверху
                 if (!currentTaskDisplay.classList.contains('empty')) {
                     currentTaskDisplay.innerHTML = `
                         ${tasks[currentTaskIndex].text}
@@ -1429,12 +1335,14 @@
                     `;
                 }
                 
+                // Проверяем, завершена ли задача
                 if (currentTaskIntervalsCompleted >= currentTaskTotalIntervals) {
                     tasks[currentTaskIndex].completed = true;
                     tasksCompleted++;
                     updateStats();
                     renderTaskList();
                     
+                    // Переходим к следующей задаче
                     const nextIndex = findNextIncompleteTask();
                     if (nextIndex !== -1) {
                         selectTask(nextIndex);
@@ -1442,6 +1350,7 @@
                         currentTaskIndex = -1;
                         currentTaskDisplay.textContent = 'Задача не выбрана';
                         currentTaskDisplay.classList.add('empty');
+                        taskProgressEl.style.display = 'none';
                     }
                 }
             }
@@ -1457,6 +1366,7 @@
             return -1;
         }
 
+        // Обновление таймера из настроек
         function updateTimerFromSettings() {
             if (!isRunning) {
                 if (mode === WORK_MODE) {
@@ -1473,6 +1383,7 @@
             }
         }
 
+        // Функции таймера
         function startTimer() {
             if (tasks.length === 0) {
                 showNotification('Нет задач', 'Добавьте задачи перед началом работы');
@@ -1502,6 +1413,7 @@
                 startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> В процессе';
                 startBtn.disabled = true;
                 
+                // Автозапуск звука при старте таймера
                 if (currentSoundCategory !== 'none' && !isSoundPlaying) {
                     playSound();
                 }
@@ -1563,10 +1475,12 @@
                 currentTaskIntervalsCompleted++;
                 updateTaskProgress();
                 
+                // Останавливаем звук при завершении работы
                 if (isSoundPlaying) {
                     pauseSound();
                 }
                 
+                // Определяем тип перерыва
                 if (sessionsCompleted % 4 === 0) {
                     showNotification(
                         'Длинный перерыв',
@@ -1617,74 +1531,19 @@
             }
         }
 
+        // Управление звуком
         function setSoundCategory(sound) {
+            // Останавливаем текущий звук
+            pauseSound();
+            
             currentSoundCategory = sound;
-            currentTrackIndex = 1;
-            
-            updateSoundButtons();
-            updateTrackControls();
-            
-            stopAllSounds();
-            isSoundPlaying = false;
-            updatePlayPauseButton();
             
             if (sound === 'none') {
-                trackControls.style.opacity = '0.5';
-                trackControls.style.pointerEvents = 'none';
-                playPauseBtn.style.pointerEvents = 'none';
-                playPauseBtn.style.opacity = '0.5';
-            } else {
-                trackControls.style.opacity = '1';
-                trackControls.style.pointerEvents = 'auto';
-                playPauseBtn.style.pointerEvents = 'auto';
-                playPauseBtn.style.opacity = '1';
-            }
-        }
-
-        function playCurrentTrack() {
-            if (currentSoundCategory === 'none') {
-                isSoundPlaying = false;
-                updatePlayPauseButton();
-                return;
+                return; // Без звука
             }
             
-            stopAllSounds();
-            
-            const audioId = `${currentSoundCategory}-track-${currentTrackIndex}`;
-            const audio = document.getElementById(audioId);
-            
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play().then(() => {
-                    isSoundPlaying = true;
-                    updatePlayPauseButton();
-                }).catch(e => {
-                    console.log('Ошибка воспроизведения звука:', e);
-                    isSoundPlaying = false;
-                    updatePlayPauseButton();
-                });
-            } else {
-                isSoundPlaying = false;
-                updatePlayPauseButton();
-            }
-        }
-
-        function stopAllSounds() {
-            const allAudio = document.querySelectorAll('audio');
-            allAudio.forEach(audio => {
-                audio.pause();
-                audio.currentTime = 0;
-            });
-            isSoundPlaying = false;
-            updatePlayPauseButton();
-        }
-
-        function toggleSound() {
-            if (currentSoundCategory === 'none') return;
-            
-            if (isSoundPlaying) {
-                pauseSound();
-            } else {
+            // Если таймер запущен, автоматически включаем звук
+            if (isRunning) {
                 playSound();
             }
         }
@@ -1692,135 +1551,58 @@
         function playSound() {
             if (currentSoundCategory === 'none') return;
             
-            if (!isSoundPlaying) {
-                playCurrentTrack();
+            // Останавливаем все звуки перед воспроизведением нового
+            stopAllSounds();
+            
+            const audio = document.getElementById(`${currentSoundCategory}-track`);
+            
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().then(() => {
+                    isSoundPlaying = true;
+                }).catch(e => {
+                    console.log('Ошибка воспроизведения звука:', e);
+                    isSoundPlaying = false;
+                });
             }
+        }
+
+        function stopAllSounds() {
+            // Останавливаем все аудио элементы
+            const soundTypes = ['lofi', 'fireplace', 'rain', 'waves', 'forest'];
+            soundTypes.forEach(sound => {
+                const audio = document.getElementById(`${sound}-track`);
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
+            isSoundPlaying = false;
         }
 
         function pauseSound() {
             if (currentSoundCategory === 'none') return;
             
-            if (isSoundPlaying) {
-                const audioId = `${currentSoundCategory}-track-${currentTrackIndex}`;
-                const audio = document.getElementById(audioId);
-                if (audio) {
-                    audio.pause();
-                }
+            const audio = document.getElementById(`${currentSoundCategory}-track`);
+            if (audio) {
+                audio.pause();
                 isSoundPlaying = false;
-                updatePlayPauseButton();
             }
         }
 
-        function prevTrack() {
-            if (currentSoundCategory === 'none') return;
-            
-            currentTrackIndex--;
-            if (currentTrackIndex < 1) {
-                currentTrackIndex = maxTracks;
-            }
-            updateTrackControls();
-            
-            if (isSoundPlaying) {
-                playCurrentTrack();
-            }
-        }
-
-        function nextTrack() {
-            if (currentSoundCategory === 'none') return;
-            
-            currentTrackIndex++;
-            if (currentTrackIndex > maxTracks) {
-                currentTrackIndex = 1;
-            }
-            updateTrackControls();
-            
-            if (isSoundPlaying) {
-                playCurrentTrack();
-            }
-        }
-
-        function updateSoundButtons() {
-            soundButtons.forEach(btn => {
-                if (btn.dataset.sound === currentSoundCategory) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-        }
-
-        function updateTrackControls() {
-            if (currentSoundCategory === 'none') {
-                trackName.textContent = 'Без звука';
-                trackVariant.textContent = '';
-                trackNumber.textContent = '-/-';
-                trackIcon.innerHTML = '<i class="fas fa-volume-mute"></i>';
-                trackIcon.className = 'track-icon';
-                return;
-            }
-            
-            const soundName = {
-                lofi: 'Lofi',
-                fireplace: 'Камин',
-                snow: 'Снег',
-                storm: 'Ураган',
-                newyear: 'Новый год'
-            };
-            
-            trackName.textContent = soundName[currentSoundCategory];
-            trackVariant.textContent = soundTracks[currentSoundCategory][currentTrackIndex - 1];
-            trackNumber.textContent = `${currentTrackIndex}/${maxTracks}`;
-            
-            const iconClass = soundColors[currentSoundCategory];
-            trackIcon.className = `track-icon ${iconClass}`;
-            trackIcon.innerHTML = `<i class="fas fa-${soundIcons[currentSoundCategory]}"></i>`;
-        }
-
-        function updatePlayPauseButton() {
-            if (currentSoundCategory === 'none') {
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-                playPauseBtn.classList.remove('paused');
-                return;
-            }
-            
-            if (isSoundPlaying) {
-                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                playPauseBtn.classList.remove('paused');
-            } else {
-                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-                playPauseBtn.classList.add('paused');
-            }
-        }
-
-        function playBeep() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (e) {
-                console.log('Аудио контекст не поддерживается');
-            }
-        }
-
+        // Уведомления
         function showNotification(title, message, type = 'info') {
+            console.log('Показ уведомления:', title, message);
+            
+            // 1. Показываем локальное уведомление (всегда работает)
             showLocalNotification(title, message);
             
+            // 2. Показываем браузерное уведомление (если разрешено)
             if (notificationPermission) {
                 showBrowserNotification(title, message);
             }
             
+            // 3. Проигрываем звук уведомления
             playBeep();
             
             if (type === 'break') {
@@ -1835,6 +1617,7 @@
             notificationMessage.textContent = message;
             localNotification.classList.add('show');
             
+            // Автоматически скрываем через 10 секунд
             setTimeout(() => {
                 if (localNotification.classList.contains('show')) {
                     hideLocalNotification();
@@ -1872,11 +1655,37 @@
             }
         }
 
+        function playBeep() {
+            // Простой бип для уведомлений
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Аудио контекст не поддерживается');
+            }
+        }
+
+        // Настройки
         function saveSettingsHandler() {
             settingsModal.classList.remove('active');
+            // Применяем настройки
             updateTimerFromSettings();
         }
 
+        // Вспомогательные функции
         function updateDisplay(seconds) {
             const minutes = Math.floor(seconds / 60).toString().padStart(2, '0');
             const secs = (seconds % 60).toString().padStart(2, '0');
