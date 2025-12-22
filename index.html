@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OSINEC TIMER</title>
+    <title>🍅 Minimal Timer</title>
     <style>
         :root {
             --primary: #3A86FF;
@@ -147,7 +147,57 @@
             color: var(--secondary);
         }
 
-        /* Tasks - ЗАДАЧИ В ВЕРХНЕЙ ЧАСТИ */
+        /* Controls - ПЕРЕМЕЩЕНЫ ПОД ТАЙМЕР */
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 25px 0 20px 0;
+        }
+
+        .control-btn {
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .control-btn.start {
+            background: var(--primary);
+            color: white;
+        }
+
+        .control-btn.start:hover {
+            background: var(--primary-dark);
+        }
+
+        .control-btn.pause {
+            background: rgba(113, 128, 150, 0.1);
+            color: var(--text);
+        }
+
+        .control-btn.pause:hover {
+            background: rgba(113, 128, 150, 0.2);
+        }
+
+        .control-btn.reset {
+            background: none;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .control-btn.reset:hover {
+            border-color: var(--text-light);
+        }
+
+        /* Tasks */
         .tasks-section {
             margin-bottom: 25px;
         }
@@ -405,7 +455,7 @@
             background: rgba(255, 0, 110, 0.1);
         }
 
-        /* Sound Controls - ПЕРЕМЕЩЕН ВНИЗ */
+        /* Sound Controls */
         .sound-controls {
             margin: 20px 0;
             background: rgba(58, 134, 255, 0.03);
@@ -464,56 +514,6 @@
         .sound-btn i {
             font-size: 18px;
             margin-bottom: 4px;
-        }
-
-        /* Controls */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin: 25px 0 20px 0;
-        }
-
-        .control-btn {
-            padding: 14px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .control-btn.start {
-            background: var(--primary);
-            color: white;
-        }
-
-        .control-btn.start:hover {
-            background: var(--primary-dark);
-        }
-
-        .control-btn.pause {
-            background: rgba(113, 128, 150, 0.1);
-            color: var(--text);
-        }
-
-        .control-btn.pause:hover {
-            background: rgba(113, 128, 150, 0.2);
-        }
-
-        .control-btn.reset {
-            background: none;
-            color: var(--text);
-            border: 2px solid var(--border);
-        }
-
-        .control-btn.reset:hover {
-            border-color: var(--text-light);
         }
 
         /* Stats */
@@ -871,7 +871,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Just Focus</h1>
+            <h1>Minimal Timer</h1>
             <p>Сфокусируйтесь на важном</p>
             <button class="settings-btn" id="settingsBtn">
                 <i class="fas fa-cog"></i>
@@ -887,7 +887,23 @@
             <div class="mode-indicator" id="modeIndicator">Работа</div>
         </div>
 
-        <!-- Tasks - НАХОДИТСЯ В ВЕРХНЕЙ ЧАСТИ -->
+        <!-- Controls - ПОД ТАЙМЕРОМ -->
+        <div class="controls">
+            <button class="control-btn start" id="startBtn">
+                <i class="fas fa-play"></i>
+                Старт
+            </button>
+            <button class="control-btn pause" id="pauseBtn">
+                <i class="fas fa-pause"></i>
+                Пауза
+            </button>
+            <button class="control-btn reset" id="resetBtn">
+                <i class="fas fa-redo"></i>
+                Сброс
+            </button>
+        </div>
+
+        <!-- Tasks -->
         <div class="tasks-section">
             <div class="section-title">
                 <i class="fas fa-tasks"></i>
@@ -918,7 +934,7 @@
             </div>
         </div>
 
-        <!-- Sound Controls - ПЕРЕМЕЩЕН ВНИЗ -->
+        <!-- Sound Controls -->
         <div class="sound-controls">
             <div class="sound-title">
                 <i class="fas fa-music"></i>
@@ -968,22 +984,6 @@
                 <div class="stat-value" id="tasksCompleted">0</div>
                 <div class="stat-label">Задачи</div>
             </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button class="control-btn start" id="startBtn">
-                <i class="fas fa-play"></i>
-                Старт
-            </button>
-            <button class="control-btn pause" id="pauseBtn">
-                <i class="fas fa-pause"></i>
-                Пауза
-            </button>
-            <button class="control-btn reset" id="resetBtn">
-                <i class="fas fa-redo"></i>
-                Сброс
-            </button>
         </div>
     </div>
 
