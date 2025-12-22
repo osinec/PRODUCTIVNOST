@@ -405,7 +405,7 @@
             background: rgba(255, 0, 110, 0.1);
         }
 
-        /* Sound Controls - упрощено */
+        /* Sound Controls */
         .sound-controls {
             margin: 20px 0;
             background: rgba(58, 134, 255, 0.03);
@@ -894,7 +894,7 @@
                 Фоновый звук
             </div>
             
-            <!-- Sound Buttons - только один вариант каждого типа -->
+            <!-- Sound Buttons -->
             <div class="sound-buttons" id="soundButtons">
                 <button class="sound-btn" data-sound="lofi">
                     <i class="fas fa-headphones"></i>
@@ -1027,9 +1027,9 @@
     <!-- Hidden element for browser notifications -->
     <div class="browser-notification" id="browserNotification"></div>
 
-    <!-- Audio elements - только один трек для каждого типа -->
+    <!-- Audio elements -->
     <audio id="lofi-track" loop>
-        <source src="https://assets.mixkit.co/music/preview/mixkit-lofi-study-1121.mp3" type="audio/mpeg">
+        <source src="lofi.mp3" type="audio/mpeg">
     </audio>
     <audio id="fireplace-track" loop>
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-crackling-fireplace-1190.mp3" type="audio/mpeg">
@@ -1053,12 +1053,12 @@
         // Состояние
         let mode = WORK_MODE;
         let isRunning = false;
-        let timerInterval = null;
-        let secondsLeft = 25 * 60;
+        let timerId = null;
+        let startTime = null;
+        let duration = 25 * 60; // 25 минут в секундах
         let sessionsCompleted = 0;
         let tasksCompleted = 0;
         let totalTimeWorked = 0;
-        let initialSeconds = 25 * 60;
         let tasks = [];
         let currentTaskIndex = -1;
         
@@ -1067,7 +1067,7 @@
         let currentTaskTotalIntervals = 1;
         
         // Звуковые настройки
-        let currentSoundCategory = 'none'; // По умолчанию без звука
+        let currentSoundCategory = 'none';
         let isSoundPlaying = false;
         let notificationPermission = false;
 
@@ -1109,7 +1109,7 @@
         const soundButtons = document.querySelectorAll('.sound-btn');
 
         // Инициализация
-        updateDisplay(secondsLeft);
+        updateDisplay(duration);
         checkNotificationPermission();
 
         // Автоматическое обновление времени при изменении настроек
@@ -1156,6 +1156,18 @@
                 btn.classList.add('active');
             });
         });
+
+        // Получение времени для текущего режима в секундах
+        function getTimeForCurrentMode() {
+            if (mode === WORK_MODE) {
+                return parseInt(workDurationInput.value) * 60;
+            } else if (mode === BREAK_SHORT_MODE) {
+                return parseInt(shortBreakInput.value) * 60;
+            } else if (mode === BREAK_LONG_MODE) {
+                return parseInt(longBreakInput.value) * 60;
+            }
+            return 25 * 60;
+        }
 
         // Функции задач
         function addTask() {
@@ -1305,10 +1317,8 @@
             
             if (!isRunning && mode === WORK_MODE) {
                 // Сбрасываем таймер при выборе новой задачи
-                secondsLeft = parseInt(workDurationInput.value) * 60;
-                initialSeconds = secondsLeft;
-                updateDisplay(secondsLeft);
-                updateProgressBar();
+                updateDisplay(getTimeForCurrentMode());
+                updateProgressBar(0);
             }
         }
 
@@ -1369,21 +1379,12 @@
         // Обновление таймера из настроек
         function updateTimerFromSettings() {
             if (!isRunning) {
-                if (mode === WORK_MODE) {
-                    secondsLeft = parseInt(workDurationInput.value) * 60;
-                } else if (mode === BREAK_SHORT_MODE) {
-                    secondsLeft = parseInt(shortBreakInput.value) * 60;
-                } else if (mode === BREAK_LONG_MODE) {
-                    secondsLeft = parseInt(longBreakInput.value) * 60;
-                }
-                
-                initialSeconds = secondsLeft;
-                updateDisplay(secondsLeft);
-                updateProgressBar();
+                updateDisplay(getTimeForCurrentMode());
+                updateProgressBar(0);
             }
         }
 
-        // Функции таймера
+        // Функции таймера - ПРОСТАЯ И НАДЕЖНАЯ ВЕРСИЯ
         function startTimer() {
             if (tasks.length === 0) {
                 showNotification('Нет задач', 'Добавьте задачи перед началом работы');
@@ -1402,13 +1403,9 @@
             }
             
             if (!isRunning) {
-                secondsLeft = parseInt(workDurationInput.value) * 60;
-                initialSeconds = secondsLeft;
-                updateDisplay(secondsLeft);
-                
                 isRunning = true;
-                clearInterval(timerInterval);
-                timerInterval = setInterval(runTimer, 1000);
+                duration = getTimeForCurrentMode();
+                startTime = Date.now();
                 
                 startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> В процессе';
                 startBtn.disabled = true;
@@ -1417,13 +1414,54 @@
                 if (currentSoundCategory !== 'none' && !isSoundPlaying) {
                     playSound();
                 }
+                
+                // Запускаем точный таймер
+                timerId = setInterval(updateTimer, 1000);
+            }
+        }
+
+        function updateTimer() {
+            if (!isRunning) return;
+            
+            const now = Date.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const remaining = Math.max(0, duration - elapsed);
+            
+            updateDisplay(remaining);
+            
+            const progressPercent = ((duration - remaining) / duration) * 100;
+            updateProgressBar(progressPercent);
+            
+            // Обновляем статистику (рабочее время)
+            if (mode === WORK_MODE) {
+                const minutesWorked = Math.floor(elapsed / 60);
+                if (minutesWorked > totalTimeWorked) {
+                    totalTimeWorked = minutesWorked;
+                    updateStats();
+                }
+            }
+            
+            if (remaining <= 0) {
+                handleSessionEnd();
             }
         }
 
         function pauseTimer() {
             if (isRunning) {
                 isRunning = false;
-                clearInterval(timerInterval);
+                
+                if (timerId) {
+                    clearInterval(timerId);
+                    timerId = null;
+                }
+                
+                // Сохраняем оставшееся время
+                if (startTime) {
+                    const now = Date.now();
+                    const elapsed = Math.floor((now - startTime) / 1000);
+                    duration = Math.max(0, duration - elapsed);
+                    startTime = null;
+                }
                 
                 startBtn.innerHTML = '<i class="fas fa-play"></i> Продолжить';
                 startBtn.disabled = false;
@@ -1433,42 +1471,22 @@
         function resetTimer() {
             pauseTimer();
             
-            if (mode === WORK_MODE) {
-                secondsLeft = parseInt(workDurationInput.value) * 60;
-                initialSeconds = secondsLeft;
-            } else {
-                setInitialTimeForCurrentMode();
-            }
-            
-            updateDisplay(secondsLeft);
-            updateProgressBar();
+            duration = getTimeForCurrentMode();
+            updateDisplay(duration);
+            updateProgressBar(0);
             
             startBtn.innerHTML = '<i class="fas fa-play"></i> Старт';
             startBtn.disabled = false;
         }
 
-        function runTimer() {
-            if (secondsLeft <= 0) {
-                handleSessionEnd();
-                return;
-            }
-            
-            secondsLeft--;
-            
-            if (mode === WORK_MODE) {
-                totalTimeWorked++;
-                if (totalTimeWorked % 60 === 0) {
-                    updateStats();
-                }
-            }
-            
-            updateDisplay(secondsLeft);
-            updateProgressBar();
-        }
-
         function handleSessionEnd() {
-            clearInterval(timerInterval);
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+            }
+            
             isRunning = false;
+            startTime = null;
             
             if (mode === WORK_MODE) {
                 sessionsCompleted++;
@@ -1512,23 +1530,10 @@
 
         function switchToMode(newMode) {
             mode = newMode;
-            setInitialTimeForCurrentMode();
-            updateDisplay(secondsLeft);
+            duration = getTimeForCurrentMode();
+            updateDisplay(duration);
             updateModeIndicator(mode);
-            updateProgressBar();
-        }
-
-        function setInitialTimeForCurrentMode() {
-            if (mode === WORK_MODE) {
-                secondsLeft = parseInt(workDurationInput.value) * 60;
-                initialSeconds = secondsLeft;
-            } else if (mode === BREAK_SHORT_MODE) {
-                secondsLeft = parseInt(shortBreakInput.value) * 60;
-                initialSeconds = secondsLeft;
-            } else if (mode === BREAK_LONG_MODE) {
-                secondsLeft = parseInt(longBreakInput.value) * 60;
-                initialSeconds = secondsLeft;
-            }
+            updateProgressBar(0);
         }
 
         // Управление звуком
@@ -1682,7 +1687,11 @@
         function saveSettingsHandler() {
             settingsModal.classList.remove('active');
             // Применяем настройки
-            updateTimerFromSettings();
+            if (!isRunning) {
+                duration = getTimeForCurrentMode();
+                updateDisplay(duration);
+                updateProgressBar(0);
+            }
         }
 
         // Вспомогательные функции
@@ -1702,15 +1711,14 @@
             }
         }
 
-        function updateProgressBar() {
-            const progressPercent = ((initialSeconds - secondsLeft) / initialSeconds) * 100;
-            progressBarEl.style.width = `${progressPercent}%`;
+        function updateProgressBar(percent) {
+            progressBarEl.style.width = `${percent}%`;
         }
 
         function updateStats() {
             completedSessionsEl.textContent = sessionsCompleted;
             tasksCompletedEl.textContent = tasksCompleted;
-            totalTimeEl.textContent = Math.floor(totalTimeWorked / 60);
+            totalTimeEl.textContent = totalTimeWorked;
         }
     </script>
 </body>
