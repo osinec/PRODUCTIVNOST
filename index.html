@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>🍅 Minimal Timer</title>
+    <title>OSINEC TIMER</title>
     <style>
         :root {
             --primary: #3A86FF;
@@ -147,7 +147,7 @@
             color: var(--secondary);
         }
 
-        /* Tasks */
+        /* Tasks - ЗАДАЧИ В ВЕРХНЕЙ ЧАСТИ */
         .tasks-section {
             margin-bottom: 25px;
         }
@@ -405,7 +405,7 @@
             background: rgba(255, 0, 110, 0.1);
         }
 
-        /* Sound Controls */
+        /* Sound Controls - ПЕРЕМЕЩЕН ВНИЗ */
         .sound-controls {
             margin: 20px 0;
             background: rgba(58, 134, 255, 0.03);
@@ -871,7 +871,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Minimal Timer</h1>
+            <h1>Just Focus</h1>
             <p>Сфокусируйтесь на важном</p>
             <button class="settings-btn" id="settingsBtn">
                 <i class="fas fa-cog"></i>
@@ -887,7 +887,38 @@
             <div class="mode-indicator" id="modeIndicator">Работа</div>
         </div>
 
-        <!-- Sound Controls -->
+        <!-- Tasks - НАХОДИТСЯ В ВЕРХНЕЙ ЧАСТИ -->
+        <div class="tasks-section">
+            <div class="section-title">
+                <i class="fas fa-tasks"></i>
+                Задачи
+            </div>
+            
+            <div class="task-input-container">
+                <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
+                <div class="intervals-container">
+                    <div class="intervals-label">Кол-во интервалов</div>
+                    <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10" title="Количество помидорок (интервалов) для задачи">
+                </div>
+                <button class="add-btn" id="addTaskBtn">+</button>
+            </div>
+            
+            <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
+            
+            <!-- Task Progress -->
+            <div class="task-progress" id="taskProgress" style="display: none;">
+                <div class="task-progress-text">
+                    Интервалов выполнено: 
+                </div>
+                <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
+            </div>
+            
+            <div class="task-list" id="taskList">
+                <!-- Tasks will be added here -->
+            </div>
+        </div>
+
+        <!-- Sound Controls - ПЕРЕМЕЩЕН ВНИЗ -->
         <div class="sound-controls">
             <div class="sound-title">
                 <i class="fas fa-music"></i>
@@ -920,37 +951,6 @@
                     <i class="fas fa-volume-mute"></i>
                     Без звука
                 </button>
-            </div>
-        </div>
-
-        <!-- Tasks -->
-        <div class="tasks-section">
-            <div class="section-title">
-                <i class="fas fa-tasks"></i>
-                Задачи
-            </div>
-            
-            <div class="task-input-container">
-                <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
-                <div class="intervals-container">
-                    <div class="intervals-label">Кол-во интервалов</div>
-                    <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10" title="Количество помидорок (интервалов) для задачи">
-                </div>
-                <button class="add-btn" id="addTaskBtn">+</button>
-            </div>
-            
-            <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
-            
-            <!-- Task Progress -->
-            <div class="task-progress" id="taskProgress" style="display: none;">
-                <div class="task-progress-text">
-                    Интервалов выполнено: 
-                </div>
-                <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
-            </div>
-            
-            <div class="task-list" id="taskList">
-                <!-- Tasks will be added here -->
             </div>
         </div>
 
@@ -1029,7 +1029,7 @@
 
     <!-- Audio elements -->
     <audio id="lofi-track" loop>
-        <source src="lofi.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-lofi-study-1121.mp3" type="audio/mpeg">
     </audio>
     <audio id="fireplace-track" loop>
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-crackling-fireplace-1190.mp3" type="audio/mpeg">
