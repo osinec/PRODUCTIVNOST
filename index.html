@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>OSINEC TEIMER</title>
+    <title>OSINEC TIMER</title>
     <style>
         :root {
             --primary: #3A86FF;
@@ -198,7 +198,7 @@
             border-color: var(--text-light);
         }
 
-        /* Tasks Section - moved under controls */
+        /* Tasks Section */
         .tasks-section {
             margin-bottom: 25px;
         }
@@ -446,32 +446,6 @@
         .task-btn.delete:hover {
             color: var(--secondary);
             background: rgba(255, 0, 110, 0.1);
-        }
-
-        /* Task Progress */
-        .task-progress {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(58, 134, 255, 0.05);
-            border-radius: var(--radius-sm);
-            border: 1px solid rgba(58, 134, 255, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .task-progress-text {
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .task-progress-count {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 15px;
-            background: rgba(58, 134, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 10px;
         }
 
         /* Sound Controls */
@@ -978,7 +952,7 @@
             </div>
         </div>
 
-        <!-- Tasks Section - moved under controls -->
+        <!-- Tasks Section -->
         <div class="tasks-section">
             <div class="section-title">
                 <i class="fas fa-tasks"></i>
@@ -991,20 +965,13 @@
                     <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
                 </div>
                 <div class="intervals-wrapper">
-                    <label class="intervals-label">Количество интервалов</label>
+                    <label class="intervals-label">Интервалов</label>
                     <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10">
                 </div>
                 <button class="add-btn" id="addTaskBtn">Добавить</button>
             </div>
             
             <div class="current-task empty" id="currentTaskDisplay">Задача не выбрана</div>
-            
-            <div class="task-progress" id="taskProgress" style="display: none;">
-                <div class="task-progress-text">
-                    Интервалов выполнено: 
-                </div>
-                <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
-            </div>
             
             <div class="task-list" id="taskList">
                 <!-- Tasks will be added here -->
@@ -1223,8 +1190,6 @@
         const completedSessionsEl = document.getElementById('completedSessions');
         const tasksCompletedEl = document.getElementById('tasksCompleted');
         const totalTimeEl = document.getElementById('totalTime');
-        const taskProgressEl = document.getElementById('taskProgress');
-        const completedIntervalsDisplay = document.getElementById('completedIntervalsDisplay');
         
         const localNotification = document.getElementById('localNotification');
         const notificationTitle = document.getElementById('notificationTitle');
@@ -1406,7 +1371,6 @@
                         currentTaskIndex = -1;
                         currentTaskDisplay.textContent = 'Задача не выбрана';
                         currentTaskDisplay.classList.add('empty');
-                        taskProgressEl.style.display = 'none';
                     }
                 } else {
                     tasks.splice(taskIndex, 1);
@@ -1433,8 +1397,6 @@
             
             currentTaskIntervalsCompleted = task.completedIntervals;
             currentTaskTotalIntervals = task.intervals;
-            updateTaskProgress();
-            taskProgressEl.style.display = 'flex';
             
             document.querySelectorAll('.task-item').forEach((item, i) => {
                 item.classList.toggle('active', i === index);
@@ -1449,8 +1411,6 @@
         }
 
         function updateTaskProgress() {
-            completedIntervalsDisplay.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
-            
             if (currentTaskIndex !== -1) {
                 tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
                 
@@ -1482,7 +1442,6 @@
                         currentTaskIndex = -1;
                         currentTaskDisplay.textContent = 'Задача не выбрана';
                         currentTaskDisplay.classList.add('empty');
-                        taskProgressEl.style.display = 'none';
                     }
                 }
             }
