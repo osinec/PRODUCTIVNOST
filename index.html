@@ -85,21 +85,14 @@
         .mode-btn.active { background:var(--primary); color:white; border-color:var(--primary); }
         .mode-btn.break.active { background:var(--secondary); color:white; border-color:var(--secondary); }
 
-        .current-task-section { margin: 20px 0; }
         .current-task {
-            padding:16px; background:rgba(58,134,255,.12); border-radius:var(--radius-sm);
-            border:1px solid rgba(58,134,255,.25); font-weight:500; font-size:15px;
-            display:flex; align-items:center; justify-content:space-between; gap:12px;
+            padding:16px; background:rgba(58,134,255,.08); border-radius:var(--radius-sm);
+            border:1px solid rgba(58,134,255,.2); font-weight:500; font-size:14px;
+            display:flex; align-items:center; justify-content:space-between;
         }
         .current-task.empty {
-            background:rgba(113,128,150,.08); border:1px solid var(--border);
-            color:var(--text-light); text-align:center; font-style:italic;
-        }
-        .current-task .task-name { flex:1; }
-        .current-task .intervals { 
-            background:rgba(58,134,255,.2); color:var(--primary); 
-            padding:4px 10px; border-radius:12px; font-size:13px; font-weight:600;
-            white-space:nowrap;
+            background:rgba(113,128,150,.05); border:1px solid var(--border);
+            color:var(--text-light); text-align:center; display:block; padding:14px;
         }
 
         .controls { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:25px 0 20px; }
@@ -222,7 +215,7 @@
     </div>
 
     <div class="current-task-section">
-        <div class="current-task empty" id="currentTaskDisplay">Выберите задачу и нажмите "Старт"</div>
+        <div class="current-task empty" id="currentTaskDisplay">Текущая задача отсутствует</div>
     </div>
 
     <div class="controls">
@@ -235,7 +228,7 @@
         <div class="section-title"><i class="fas fa-tasks"></i> Задачи</div>
 
         <div class="task-input-container">
-            <input type="text" class="task-input" id="taskInput" placeholder="Введите задачу...">
+            <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
             <div class="intervals-container">
                 <div class="intervals-label">Помидорок</div>
                 <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10">
@@ -244,7 +237,7 @@
         </div>
 
         <div class="task-progress" id="taskProgress" style="display:none;">
-            <div class="task-progress-text">Выполнено помидорок:</div>
+            <div class="task-progress-text">Выполнено интервалов:</div>
             <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
         </div>
 
@@ -268,7 +261,7 @@
     </div>
 </div>
 
-<!-- Настройки -->
+<!-- Модальное окно настроек -->
 <div class="settings-modal" id="settingsModal">
     <div class="settings-content">
         <div class="settings-header">
@@ -330,7 +323,7 @@
 
 <script>
 // =============================================================================
-// Переменные
+// Основные переменные
 // =============================================================================
 const WORK_MODE = 'work';
 const BREAK_SHORT_MODE = 'shortBreak';
@@ -355,7 +348,7 @@ let isSoundPlaying = false;
 let notificationPermission = false;
 
 // =============================================================================
-// DOM
+// DOM элементы
 // =============================================================================
 const display = document.getElementById('display');
 const progressBar = document.getElementById('progressBar');
@@ -400,10 +393,9 @@ resetTimer();
 checkNotificationPermission();
 updateModeButtons();
 updateLongBreakProgress();
-renderTaskList();
 
 // =============================================================================
-// События
+// Обработчики событий
 // =============================================================================
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
@@ -455,12 +447,6 @@ function setMode(newMode) {
 
 function startTimer() {
     if (isRunning) return;
-
-    // Если режим "Работа" → обновляем отображение текущей задачи
-    if (mode === WORK_MODE) {
-        refreshCurrentTaskDisplay();
-    }
-
     isRunning = true;
     endTime = Date.now() + getDuration() * 1000;
 
@@ -506,49 +492,10 @@ function resetTimer() {
     endTime = Date.now() + getDuration() * 1000;
     updateDisplay(getDuration());
     updateProgressBar(0);
-
-    // При сбросе в режиме работы тоже обновляем вид задачи
-    if (mode === WORK_MODE) {
-        refreshCurrentTaskDisplay();
-    }
-
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
     startBtn.disabled = false;
 }
 
-// =============================================================================
-// Обновление блока текущей задачи под таймером
-// =============================================================================
-function refreshCurrentTaskDisplay() {
-    if (currentTaskIndex === -1 || currentTaskIndex >= tasks.length) {
-        currentTaskDisplay.classList.add('empty');
-        currentTaskDisplay.innerHTML = 'Выберите задачу и нажмите "Старт"';
-        taskProgressEl.style.display = 'none';
-        return;
-    }
-
-    const task = tasks[currentTaskIndex];
-
-    currentTaskDisplay.classList.remove('empty');
-    currentTaskDisplay.innerHTML = `
-        <span class="task-name">${task.text}</span>
-        <span class="intervals">${task.completedIntervals} / ${task.intervals}</span>
-    `;
-
-    // Показываем прогресс-бар только если задача выбрана и есть хотя бы 1 помидор
-    taskProgressEl.style.display = (task.intervals > 0) ? 'flex' : 'none';
-    updateTaskProgressDisplay();
-}
-
-function updateTaskProgressDisplay() {
-    if (currentTaskIndex === -1) return;
-    const task = tasks[currentTaskIndex];
-    completedIntervalsDisplay.textContent = `${task.completedIntervals}/${task.intervals}`;
-}
-
-// =============================================================================
-// Завершение интервала
-// =============================================================================
 function handleSessionEnd() {
     clearInterval(timerId);
     timerId = null;
@@ -558,13 +505,8 @@ function handleSessionEnd() {
 
     if (mode === WORK_MODE) {
         sessionsCompleted++;
-        if (currentTaskIndex !== -1) {
-            currentTaskIntervalsCompleted++;
-            tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
-            updateTaskProgressDisplay();
-            refreshCurrentTaskDisplay();
-        }
-
+        currentTaskIntervalsCompleted++;
+        updateTaskProgress();
         updateLongBreakProgress();
 
         if (isSoundPlaying) pauseBackgroundSound();
@@ -575,7 +517,7 @@ function handleSessionEnd() {
         showNotification(
             isLong ? 'Длинный перерыв!' : 'Короткий перерыв',
             isLong
-                ? `Отдохните ${longBreakInput.value} минут.`
+                ? `Отдохните ${longBreakInput.value} минут. Отлично поработали!`
                 : `Перерыв. До длинного осталось ${needed - (sessionsCompleted % needed)} сессий.`,
             'break'
         );
@@ -584,7 +526,7 @@ function handleSessionEnd() {
     } else {
         showNotification(
             'Время работать!',
-            'Перерыв закончился — продолжаем.',
+            'Перерыв закончился — возвращаемся к задаче.',
             'work'
         );
         setTimeout(() => setMode(WORK_MODE), 800);
@@ -595,9 +537,8 @@ function handleSessionEnd() {
 }
 
 // =============================================================================
-// Остальные функции (уведомления, звук, задачи, статистика) — без изменений
+// Уведомления
 // =============================================================================
-
 function showNotification(title, msg, type = 'info') {
     notificationTitle.textContent = title;
     notificationMessage.textContent = msg;
@@ -622,11 +563,14 @@ function startFromNotification() {
     startTimer();
 }
 
+// =============================================================================
+// Звуки
+// =============================================================================
 function playAlertSound() {
     const snd = document.getElementById('alert-sound');
     snd.currentTime = 0;
     snd.volume = 0.7;
-    snd.play().catch(() => {});
+    snd.play().catch(e => console.log("Звук не воспроизведён", e));
 }
 
 function playBackgroundSound() {
@@ -661,33 +605,35 @@ function setSoundCategory(cat) {
     if (isRunning && cat !== 'none') playBackgroundSound();
 }
 
+// =============================================================================
+// Задачи
+// =============================================================================
 function addTask() {
     const text = taskInput.value.trim();
     const intervals = Number(taskIntervalsInput.value) || 1;
     if (!text) return;
 
-    tasks.push({
+    const task = {
         id: Date.now(),
         text,
         intervals,
         completedIntervals: 0,
         completed: false
-    });
+    };
 
+    tasks.push(task);
     renderTaskList();
     taskInput.value = '';
     taskInput.focus();
 
-    if (currentTaskIndex === -1) {
-        selectTask(tasks.length - 1);
-    }
+    if (currentTaskIndex === -1) selectTask(tasks.length - 1);
 }
 
 function renderTaskList() {
     taskListEl.innerHTML = '';
 
     if (tasks.length === 0) {
-        taskListEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-light);">Нет задач</div>';
+        taskListEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-light);">Нет задач</div>';
         return;
     }
 
@@ -731,11 +677,6 @@ window.toggleTaskCompletion = function(id) {
         const next = findNextIncompleteTask();
         if (next !== -1) selectTask(next);
     }
-
-    // Если задача текущая — обновляем блок под таймером
-    if (idx === currentTaskIndex) {
-        refreshCurrentTaskDisplay();
-    }
 };
 
 window.deleteTask = function(id) {
@@ -743,18 +684,11 @@ window.deleteTask = function(id) {
     if (idx === -1) return;
 
     if (tasks[idx].completed) tasksCompleted--;
-
     if (idx === currentTaskIndex) {
         const next = findNextIncompleteTask(idx);
         tasks.splice(idx, 1);
-        if (next !== -1 && tasks.length > 0) {
-            selectTask(next >= tasks.length ? tasks.length - 1 : next);
-        } else {
-            currentTaskIndex = -1;
-            currentTaskDisplay.classList.add('empty');
-            currentTaskDisplay.innerHTML = 'Выберите задачу и нажмите "Старт"';
-            taskProgressEl.style.display = 'none';
-        }
+        if (next !== -1) selectTask(next < tasks.length ? next : tasks.length - 1);
+        else currentTaskIndex = -1;
     } else {
         tasks.splice(idx, 1);
         if (currentTaskIndex > idx) currentTaskIndex--;
@@ -762,19 +696,64 @@ window.deleteTask = function(id) {
 
     renderTaskList();
     updateStats();
+
+    if (currentTaskIndex === -1) {
+        currentTaskDisplay.classList.add('empty');
+        currentTaskDisplay.textContent = 'Текущая задача отсутствует';
+        taskProgressEl.style.display = 'none';
+    }
 };
 
 function selectTask(index) {
     if (index < 0 || index >= tasks.length) return;
-
     currentTaskIndex = index;
-    const task = tasks[index];
+    const t = tasks[index];
 
-    refreshCurrentTaskDisplay();
+    currentTaskDisplay.innerHTML = `${t.text} <span class="task-intervals">${t.completedIntervals}/${t.intervals}</span>`;
+    currentTaskDisplay.classList.remove('empty');
 
-    document.querySelectorAll('.task-item').forEach((el,i) => {
-        el.classList.toggle('active', i === index);
-    });
+    currentTaskIntervalsCompleted = t.completedIntervals;
+    currentTaskTotalIntervals = t.intervals;
+    updateTaskProgress();
+    taskProgressEl.style.display = 'flex';
+
+    document.querySelectorAll('.task-item').forEach((el,i) => el.classList.toggle('active', i === index));
+}
+
+function updateTaskProgress() {
+    completedIntervalsDisplay.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+
+    if (currentTaskIndex === -1) return;
+
+    tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
+
+    // Обновляем бейдж в списке
+    const items = taskListEl.querySelectorAll('.task-item');
+    if (items[currentTaskIndex]) {
+        const badge = items[currentTaskIndex].querySelector('.task-intervals-badge');
+        if (badge) badge.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+    }
+
+    // Обновляем текущую задачу сверху
+    if (!currentTaskDisplay.classList.contains('empty')) {
+        currentTaskDisplay.innerHTML = `${tasks[currentTaskIndex].text} <span class="task-intervals">${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}</span>`;
+    }
+
+    if (currentTaskIntervalsCompleted >= currentTaskTotalIntervals) {
+        tasks[currentTaskIndex].completed = true;
+        tasksCompleted++;
+        updateStats();
+        renderTaskList();
+
+        const next = findNextIncompleteTask();
+        if (next !== -1) selectTask(next);
+        else {
+            currentTaskIndex = -1;
+            currentTaskDisplay.classList.add('empty');
+            currentTaskDisplay.textContent = 'Текущая задача отсутствует';
+            taskProgressEl.style.display = 'none';
+        }
+    }
 }
 
 function findNextIncompleteTask(start = 0) {
@@ -821,8 +800,8 @@ function checkNotificationPermission() {
     if (Notification.permission === "granted") {
         notificationPermission = true;
     } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(p => {
-            notificationPermission = p === "granted";
+        Notification.requestPermission().then(perm => {
+            notificationPermission = perm === "granted";
         });
     }
 }
@@ -831,7 +810,7 @@ function updateLongBreakProgress() {
     const needed = Number(sessionsUntilLongBreakInput.value) || 4;
     const progress = sessionsCompleted % needed;
     currentProgressDisplay.textContent = `${progress}/${needed}`;
-    longBreakProgressBar.style.width = `${progress / needed * 100}%`;
+    longBreakProgressBar.style.width = `${(progress / needed) * 100}%`;
 }
 
 function updateLongBreakSettings() {
@@ -844,6 +823,11 @@ function saveSettingsHandler() {
     settingsModal.classList.remove('active');
     if (!isRunning) resetTimer();
 }
+
+// =============================================================================
+// Старт
+// =============================================================================
+renderTaskList();
 </script>
 </body>
 </html>
