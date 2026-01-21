@@ -23,14 +23,20 @@
             --radius: 20px;
             --radius-sm: 12px;
             --glass: rgba(255, 255, 255, 0.05);
+           
+            /* Цвета тегов задач */
+            --important-urgent: #EF4444; /* Красный - Важно-Срочно */
+            --important-not-urgent: #10B981; /* Зеленый - Важно-Несрочно */
+            --not-important-urgent: #F59E0B; /* Желтый - Неважно-Срочно */
+            --not-important-not-urgent: #8B5CF6; /* Фиолетовый - Неважно-Несрочно */
         }
-        
+       
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+       
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--gradient-bg);
@@ -43,7 +49,7 @@
             position: relative;
             overflow-x: hidden;
         }
-        
+       
         body::before {
             content: '';
             position: fixed;
@@ -51,13 +57,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
             z-index: -1;
         }
-        
+       
         .container {
             max-width: 500px;
             width: 100%;
@@ -71,7 +77,7 @@
             overflow: hidden;
             z-index: 1;
         }
-        
+       
         .container::before {
             content: '';
             position: absolute;
@@ -82,13 +88,13 @@
             background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
             border-radius: var(--radius) var(--radius) 0 0;
         }
-        
+       
         .header {
             text-align: center;
             margin-bottom: 30px;
             position: relative;
         }
-        
+       
         .header h1 {
             font-size: 32px;
             font-weight: 800;
@@ -98,13 +104,13 @@
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
-        
+       
         .header p {
             color: var(--text-light);
             font-size: 15px;
             font-weight: 400;
         }
-        
+       
         .settings-btn {
             position: absolute;
             top: 0;
@@ -121,19 +127,19 @@
             color: var(--text-light);
             transition: all 0.3s ease;
         }
-        
+       
         .settings-btn:hover {
             background: var(--primary);
             color: white;
             transform: rotate(90deg);
             border-color: var(--primary);
         }
-        
+       
         .timer-section {
             position: relative;
             margin-bottom: 30px;
         }
-        
+       
         .timer-display {
             font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
             font-size: 72px;
@@ -146,7 +152,7 @@
             display: inline-block;
             width: 100%;
         }
-        
+       
         .timer-display::after {
             content: '';
             position: absolute;
@@ -157,14 +163,14 @@
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
         }
-        
+       
         .progress-ring {
             width: 220px;
             height: 220px;
             margin: 0 auto 25px;
             position: relative;
         }
-        
+       
         .progress-ring-circle {
             fill: none;
             stroke-width: 8;
@@ -173,15 +179,15 @@
             transform-origin: 50% 50%;
             transition: stroke-dashoffset 0.5s ease;
         }
-        
+       
         .progress-ring-bg {
             stroke: rgba(255, 255, 255, 0.1);
         }
-        
+       
         .progress-ring-fill {
             stroke: url(#gradient);
         }
-        
+       
         .mode-indicator {
             text-align: center;
             font-size: 16px;
@@ -196,24 +202,24 @@
             border: 1px solid var(--card-border);
             backdrop-filter: blur(10px);
         }
-        
+       
         .mode-indicator.work {
             color: var(--primary-light);
             border-color: rgba(139, 92, 246, 0.3);
         }
-        
+       
         .mode-indicator.break {
             color: var(--secondary-light);
             border-color: rgba(16, 185, 129, 0.3);
         }
-        
+       
         .mode-selector {
             display: flex;
             gap: 12px;
             margin: 25px 0;
             justify-content: center;
         }
-        
+       
         .mode-btn {
             padding: 14px 28px;
             border: 2px solid var(--card-border);
@@ -233,7 +239,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+       
         .mode-btn::before {
             content: '';
             position: absolute;
@@ -244,26 +250,26 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transition: left 0.5s ease;
         }
-        
+       
         .mode-btn:hover::before {
             left: 100%;
         }
-        
+       
         .mode-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow);
         }
-        
+       
         .mode-btn.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-color: transparent;
         }
-        
+       
         .mode-btn.break.active {
             background: linear-gradient(135deg, var(--secondary), var(--secondary-light));
         }
-        
+       
         .current-task {
             padding: 18px;
             background: var(--glass);
@@ -278,12 +284,12 @@
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
-        
+       
         .current-task:hover {
             border-color: rgba(139, 92, 246, 0.4);
             transform: translateY(-1px);
         }
-        
+       
         .current-task.empty {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-light);
@@ -291,14 +297,14 @@
             display: block;
             padding: 16px;
         }
-        
+       
         .controls {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
             margin: 30px 0 25px;
         }
-        
+       
         .control-btn {
             padding: 16px;
             border: none;
@@ -314,41 +320,41 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+       
         .control-btn.start {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
-        
+       
         .control-btn.start:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
-        
+       
         .control-btn.pause {
             background: var(--glass);
             color: var(--text);
             border: 1px solid var(--card-border);
         }
-        
+       
         .control-btn.pause:hover {
             background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
         }
-        
+       
         .control-btn.reset {
             background: transparent;
             color: var(--text-light);
             border: 2px solid var(--card-border);
         }
-        
+       
         .control-btn.reset:hover {
             border-color: var(--text-light);
             color: var(--text);
             transform: translateY(-2px);
         }
-        
+       
         .section-title {
             font-size: 16px;
             font-weight: 600;
@@ -358,19 +364,19 @@
             gap: 10px;
             color: var(--text-light);
         }
-        
+       
         .section-title i {
             color: var(--primary);
             font-size: 14px;
         }
-        
+       
         .task-input-container {
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
             align-items: flex-end;
         }
-        
+       
         .task-input {
             flex: 1;
             padding: 14px 18px;
@@ -381,24 +387,40 @@
             color: var(--text);
             transition: all 0.3s ease;
         }
-        
+       
         .task-input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
             background: rgba(30, 41, 59, 0.9);
         }
-        
-        .intervals-input {
+       
+        .intervals-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100px;
+        }
+       
+        .intervals-input {
+            width: 100%;
             padding: 14px;
             border: 2px solid var(--card-border);
             border-radius: var(--radius-sm);
             text-align: center;
             background: var(--glass);
             color: var(--text);
+            font-size: 14px;
         }
-        
+       
+        .intervals-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+            text-align: center;
+            width: 100%;
+        }
+       
         .add-btn {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
@@ -413,12 +435,12 @@
             align-items: center;
             justify-content: center;
         }
-        
+       
         .add-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
-        
+       
         .task-progress {
             margin: 15px 0;
             padding: 14px;
@@ -430,7 +452,7 @@
             align-items: center;
             backdrop-filter: blur(10px);
         }
-        
+       
         .task-progress-count {
             color: var(--primary-light);
             font-weight: 700;
@@ -439,51 +461,60 @@
             border-radius: 20px;
             font-size: 14px;
         }
-        
+       
         .task-list {
-            max-height: 200px;
-            overflow-y: auto;
             border: 1px solid var(--card-border);
             border-radius: var(--radius-sm);
             background: rgba(15, 23, 42, 0.5);
+            margin-bottom: 20px;
+            min-height: 60px;
+            overflow: visible;
         }
-        
-        .task-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .task-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-        
-        .task-list::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-        
+       
         .task-item {
             padding: 16px 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 14px;
             transition: all 0.3s ease;
+            cursor: grab;
+            position: relative;
         }
-        
+       
         .task-item:hover {
             background: rgba(255, 255, 255, 0.05);
         }
-        
+       
         .task-item:last-child {
             border-bottom: none;
         }
-        
+       
         .task-item.active {
             background: rgba(139, 92, 246, 0.1);
             border-left: 3px solid var(--primary);
         }
-        
+       
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+            border: 2px dashed var(--primary);
+        }
+       
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-light);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+       
+        .drag-handle:hover {
+            color: var(--primary);
+        }
+       
         .task-checkbox {
             width: 20px;
             height: 20px;
@@ -495,42 +526,66 @@
             justify-content: center;
             transition: all 0.3s ease;
             flex-shrink: 0;
+            margin-top: 2px;
         }
-        
+       
         .task-checkbox:hover {
             border-color: var(--primary);
         }
-        
+       
         .task-checkbox.checked {
             background: var(--secondary);
             border-color: var(--secondary);
         }
-        
+       
         .task-checkbox.checked::after {
             content: '✓';
             color: white;
             font-size: 12px;
             font-weight: bold;
         }
-        
+       
         .task-content {
             flex: 1;
             min-width: 0;
         }
-        
+       
         .task-text {
             font-size: 14px;
             font-weight: 500;
             margin-bottom: 4px;
             word-break: break-word;
         }
-        
+       
         .task-text.completed {
             text-decoration: line-through;
             color: var(--text-light);
             opacity: 0.7;
         }
-        
+       
+        .task-comment {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+            display: none;
+        }
+       
+        .task-comment.show {
+            display: block;
+        }
+       
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+       
         .task-intervals-badge {
             color: var(--primary-light);
             font-weight: 600;
@@ -540,13 +595,55 @@
             border-radius: 12px;
             display: inline-block;
         }
-        
+       
+        .task-tag {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+       
+        .task-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+       
+        .task-tag.active {
+            border: 2px solid white;
+            transform: scale(1.05);
+        }
+       
+        .task-tag.important-urgent {
+            background: rgba(239, 68, 68, 0.15);
+            color: #FCA5A5;
+        }
+       
+        .task-tag.important-not-urgent {
+            background: rgba(16, 185, 129, 0.15);
+            color: #A7F3D0;
+        }
+       
+        .task-tag.not-important-urgent {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FDE68A;
+        }
+       
+        .task-tag.not-important-not-urgent {
+            background: rgba(139, 92, 246, 0.15);
+            color: #C4B5FD;
+        }
+       
         .task-actions {
             display: flex;
             gap: 8px;
             flex-shrink: 0;
         }
-        
+       
         .task-btn {
             width: 32px;
             height: 32px;
@@ -560,12 +657,71 @@
             justify-content: center;
             transition: all 0.3s ease;
         }
-        
+       
         .task-btn:hover {
             background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
         }
-        
+       
+        .task-btn.comment-btn:hover {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent);
+        }
+       
+        /* Кнопки выбора тегов при создании задачи */
+        .tag-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+       
+        .tag-selector-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+       
+        .tag-selector-btn:hover {
+            transform: translateY(-1px);
+        }
+       
+        .tag-selector-btn.active {
+            border-color: transparent;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+       
+        .tag-selector-btn.important-urgent.active {
+            background: linear-gradient(135deg, var(--important-urgent), #FF6B6B);
+            color: white;
+        }
+       
+        .tag-selector-btn.important-not-urgent.active {
+            background: linear-gradient(135deg, var(--important-not-urgent), #4ECDC4);
+            color: white;
+        }
+       
+        .tag-selector-btn.not-important-urgent.active {
+            background: linear-gradient(135deg, var(--not-important-urgent), #FFD166);
+            color: #1E293B;
+        }
+       
+        .tag-selector-btn.not-important-not-urgent.active {
+            background: linear-gradient(135deg, var(--not-important-not-urgent), #A78BFA);
+            color: white;
+        }
+       
         .sound-controls {
             margin: 25px 0;
             background: var(--glass);
@@ -573,8 +729,9 @@
             border-radius: var(--radius-sm);
             border: 1px solid var(--card-border);
             backdrop-filter: blur(10px);
+            text-align: center;
         }
-        
+       
         .sound-title {
             font-size: 14px;
             font-weight: 600;
@@ -583,15 +740,17 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            justify-content: center;
         }
-        
+       
         .sound-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-top: 15px;
+            justify-items: center;
         }
-        
+       
         .sound-btn {
             padding: 14px;
             border: 2px solid var(--card-border);
@@ -604,25 +763,30 @@
             align-items: center;
             min-height: 80px;
             transition: all 0.3s ease;
+            width: 100%;
         }
-        
+       
+        .sound-btn[data-sound="none"] {
+            grid-column: span 3;
+        }
+       
         .sound-btn:hover {
             transform: translateY(-2px);
             border-color: var(--primary);
         }
-        
+       
         .sound-btn.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border-color: transparent;
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
-        
+       
         .sound-btn i {
             font-size: 20px;
             margin-bottom: 8px;
         }
-        
+       
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -633,12 +797,13 @@
             border-radius: var(--radius-sm);
             border: 1px solid var(--card-border);
             backdrop-filter: blur(10px);
+            justify-items: center;
         }
-        
+       
         .stat-item {
             text-align: center;
         }
-        
+       
         .stat-value {
             font-size: 28px;
             font-weight: 800;
@@ -647,7 +812,7 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 4px;
         }
-        
+       
         .stat-label {
             font-size: 12px;
             color: var(--text-light);
@@ -655,7 +820,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+       
         .settings-modal {
             position: fixed;
             inset: 0;
@@ -669,12 +834,12 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
-        
+       
         .settings-modal.active {
             opacity: 1;
             visibility: visible;
         }
-        
+       
         .settings-content {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -687,24 +852,24 @@
             transform: translateY(20px);
             transition: transform 0.3s ease;
         }
-        
+       
         .settings-modal.active .settings-content {
             transform: translateY(0);
         }
-        
+       
         .settings-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
         }
-        
+       
         .settings-header h2 {
             font-size: 24px;
             font-weight: 700;
             color: var(--text);
         }
-        
+       
         .close-btn {
             width: 36px;
             height: 36px;
@@ -718,36 +883,40 @@
             justify-content: center;
             transition: all 0.3s ease;
         }
-        
+       
         .close-btn:hover {
             background: var(--danger);
             color: white;
             border-color: var(--danger);
         }
-        
+       
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 25px;
+            justify-items: center;
         }
-        
+       
         .setting-item {
             display: flex;
             flex-direction: column;
             gap: 8px;
+            align-items: center;
+            width: 100%;
         }
-        
+       
         .setting-item.full-width {
             grid-column: span 2;
         }
-        
+       
         .setting-label {
             font-size: 14px;
             color: var(--text-light);
             font-weight: 500;
+            text-align: center;
         }
-        
+       
         .setting-input {
             width: 100%;
             padding: 12px;
@@ -760,13 +929,13 @@
             text-align: center;
             transition: all 0.3s ease;
         }
-        
+       
         .setting-input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
         }
-        
+       
         .settings-save {
             width: 100%;
             padding: 16px;
@@ -781,12 +950,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+       
         .settings-save:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
         }
-        
+       
         .local-notification {
             position: fixed;
             top: 20px;
@@ -803,30 +972,33 @@
             border-left: 4px solid var(--primary);
             backdrop-filter: blur(20px);
         }
-        
+       
         .local-notification.show {
             transform: translateX(0);
         }
-        
+       
         .notification-title {
             font-size: 18px;
             font-weight: 700;
             margin-bottom: 8px;
             color: var(--primary-light);
+            text-align: center;
         }
-        
+       
         .notification-message {
             font-size: 14px;
             color: var(--text-light);
             margin-bottom: 15px;
             line-height: 1.5;
+            text-align: center;
         }
-        
+       
         .notification-buttons {
             display: flex;
             gap: 10px;
+            justify-content: center;
         }
-        
+       
         .notification-btn {
             flex: 1;
             padding: 10px 16px;
@@ -837,99 +1009,162 @@
             border: none;
             transition: all 0.3s ease;
         }
-        
+       
         .notification-btn.start {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
-        
+       
         .notification-btn.start:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
-        
+       
         .notification-btn.later {
             background: transparent;
             color: var(--text-light);
             border: 2px solid var(--card-border);
         }
-        
+       
         .notification-btn.later:hover {
             border-color: var(--text-light);
             color: var(--text);
         }
-        
+       
+        .comment-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            font-size: 13px;
+            resize: vertical;
+            min-height: 40px;
+            max-height: 100px;
+            display: none;
+        }
+       
+        .comment-input.show {
+            display: block;
+        }
+       
+        .comment-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: flex-end;
+            display: none;
+        }
+       
+        .comment-actions.show {
+            display: flex;
+        }
+       
+        .comment-btn-small {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+       
+        .comment-btn-small.save {
+            background: var(--secondary);
+            color: white;
+        }
+       
+        .comment-btn-small.cancel {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--card-border);
+        }
+       
+        .comment-btn-small:hover {
+            transform: translateY(-1px);
+        }
+       
         @media (max-width: 540px) {
             body {
                 padding: 15px;
                 align-items: flex-start;
                 padding-top: 30px;
             }
-            
+           
             .container {
                 padding: 25px 20px;
             }
-            
+           
             .timer-display {
                 font-size: 60px;
             }
-            
+           
             .progress-ring {
                 width: 200px;
                 height: 200px;
             }
-            
+           
             .mode-selector {
                 flex-direction: column;
             }
-            
+           
             .mode-btn {
                 max-width: 100%;
             }
-            
+           
             .controls {
                 grid-template-columns: 1fr;
             }
-            
+           
             .task-input-container {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
-            .intervals-input {
+           
+            .intervals-container {
                 width: 100%;
             }
-            
+           
             .sound-buttons {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
+           
+            .sound-btn[data-sound="none"] {
+                grid-column: span 2;
+            }
+           
             .settings-grid {
                 grid-template-columns: 1fr;
             }
-            
+           
             .setting-item.full-width {
                 grid-column: span 1;
             }
-            
+           
             .stats {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
         }
-        
+       
         @media (max-width: 380px) {
             .timer-display {
                 font-size: 52px;
             }
-            
+           
             .progress-ring {
                 width: 180px;
                 height: 180px;
             }
-            
+           
             .sound-buttons {
                 grid-template-columns: 1fr;
+            }
+           
+            .sound-btn[data-sound="none"] {
+                grid-column: span 1;
             }
         }
     </style>
@@ -937,14 +1172,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-
 <div class="container">
     <div class="header">
         <h1>Pomodoro Flow</h1>
         <p>Сфокусируйтесь на важном с помощью техники помидоро</p>
         <button class="settings-btn" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
     </div>
-
     <div class="timer-section">
         <div class="progress-ring">
             <svg width="220" height="220" viewBox="0 0 220 220">
@@ -960,60 +1193,65 @@
         </div>
         <div class="timer-display" id="display">25:00</div>
         <div class="mode-indicator work" id="modeIndicator">Работа</div>
-
         <div class="mode-selector">
             <button class="mode-btn active" id="workModeBtn"><i class="fas fa-briefcase"></i> Работа</button>
             <button class="mode-btn break" id="breakModeBtn"><i class="fas fa-coffee"></i> Перерыв</button>
         </div>
     </div>
-
     <div class="current-task-section">
         <div class="current-task empty" id="currentTaskDisplay">Текущая задача отсутствует</div>
     </div>
-
     <div class="controls">
         <button class="control-btn start" id="startBtn"><i class="fas fa-play"></i> Старт</button>
         <button class="control-btn pause" id="pauseBtn"><i class="fas fa-pause"></i> Пауза</button>
         <button class="control-btn reset" id="resetBtn"><i class="fas fa-redo"></i> Сброс</button>
     </div>
-
     <div class="tasks-section">
         <div class="section-title"><i class="fas fa-tasks"></i> Задачи</div>
-
         <div class="task-input-container">
             <input type="text" class="task-input" id="taskInput" placeholder="Новая задача...">
             <div class="intervals-container">
                 <input type="number" class="intervals-input" id="taskIntervals" value="1" min="1" max="10">
-                <div class="intervals-label" style="font-size:12px; color:var(--text-light); margin-top:4px;">Помидорок</div>
+                <div class="intervals-label" id="intervalsLabel">1 помидорка</div>
             </div>
             <button class="add-btn" id="addTaskBtn">Добавить</button>
         </div>
-
+        <!-- Кнопки выбора тегов при создании задачи -->
+        <div class="tag-selector" id="tagSelector">
+            <button class="tag-selector-btn important-urgent active" data-tag="important-urgent">
+                <i class="fas fa-exclamation-circle"></i> Важно & Срочно
+            </button>
+            <button class="tag-selector-btn important-not-urgent" data-tag="important-not-urgent">
+                <i class="fas fa-calendar-check"></i> Важно & Несрочно
+            </button>
+            <button class="tag-selector-btn not-important-urgent" data-tag="not-important-urgent">
+                <i class="fas fa-clock"></i> Неважно & Срочно
+            </button>
+            <button class="tag-selector-btn not-important-not-urgent" data-tag="not-important-not-urgent">
+                <i class="fas fa-trash-alt"></i> Неважно & Несрочно
+            </button>
+        </div>
         <div class="task-progress" id="taskProgress" style="display:none;">
             <div class="task-progress-text">Выполнено интервалов:</div>
             <div class="task-progress-count" id="completedIntervalsDisplay">0/1</div>
         </div>
-
         <div class="task-list" id="taskList"></div>
     </div>
-
     <div class="sound-controls">
         <div class="sound-title"><i class="fas fa-music"></i> Фоновая музыка</div>
         <div class="sound-buttons" id="soundButtons">
-            <button class="sound-btn" data-sound="lofi"><i class="fas fa-headphones"></i> Lofi</button>
+            <button class="sound-btn" data-sound="fire"><i class="fas fa-fire"></i> Костер</button>
             <button class="sound-btn" data-sound="rain"><i class="fas fa-cloud-rain"></i> Дождь</button>
             <button class="sound-btn" data-sound="forest"><i class="fas fa-tree"></i> Лес</button>
             <button class="sound-btn active" data-sound="none"><i class="fas fa-volume-mute"></i> Без звука</button>
         </div>
     </div>
-
     <div class="stats">
         <div class="stat-item"><div class="stat-value" id="completedSessions">0</div><div class="stat-label">Сессий</div></div>
         <div class="stat-item"><div class="stat-value" id="totalTime">0</div><div class="stat-label">Минут</div></div>
         <div class="stat-item"><div class="stat-value" id="tasksCompleted">0</div><div class="stat-label">Задач</div></div>
     </div>
 </div>
-
 <!-- Модальное окно настроек -->
 <div class="settings-modal" id="settingsModal">
     <div class="settings-content">
@@ -1048,7 +1286,6 @@
         <button class="settings-save" id="saveSettings">Сохранить настройки</button>
     </div>
 </div>
-
 <!-- Уведомление -->
 <div class="local-notification" id="localNotification">
     <div class="notification-title" id="notificationTitle">Время истекло</div>
@@ -1058,14 +1295,12 @@
         <button class="notification-btn later" id="notificationLaterBtn">Закрыть</button>
     </div>
 </div>
-
 <!-- Звуки -->
 <audio id="alert-sound" preload="auto">
     <source src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" type="audio/mpeg">
 </audio>
-
-<audio id="lofi-track" loop preload="none">
-    <source src="https://cdn.pixabay.com/audio/2023/08/07/audio_8b0e3e8d3d.mp3" type="audio/mpeg">
+<audio id="fire-track" loop preload="none">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/22/audio_aa2f4e87d7.mp3" type="audio/mpeg">
 </audio>
 <audio id="rain-track" loop preload="none">
     <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9e0e3e8d3d.mp3" type="audio/mpeg">
@@ -1073,7 +1308,6 @@
 <audio id="forest-track" loop preload="none">
     <source src="https://cdn.pixabay.com/audio/2022/05/25/audio_f3b2c1e8d3.mp3" type="audio/mpeg">
 </audio>
-
 <script>
 // =============================================================================
 // Основные переменные
@@ -1081,7 +1315,6 @@
 const WORK_MODE = 'work';
 const BREAK_SHORT_MODE = 'shortBreak';
 const BREAK_LONG_MODE = 'longBreak';
-
 let mode = WORK_MODE;
 let isRunning = false;
 let timerId = null;
@@ -1092,17 +1325,25 @@ let totalTimeWorked = 0;
 let tasks = [];
 let currentTaskIndex = -1;
 let sessionsUntilLongBreak = 4;
-
 let currentTaskIntervalsCompleted = 0;
 let currentTaskTotalIntervals = 1;
-
 let currentSoundCategory = 'none';
 let isSoundPlaying = false;
 let notificationPermission = false;
-
 // Новая переменная для хранения оставшегося времени при паузе
 let remainingSeconds = 0;
-
+// Теги для задач
+let availableTags = [
+    { id: 'important-urgent', name: 'Важно & Срочно', color: 'important-urgent' },
+    { id: 'important-not-urgent', name: 'Важно & Несрочно', color: 'important-not-urgent' },
+    { id: 'not-important-urgent', name: 'Неважно & Срочно', color: 'not-important-urgent' },
+    { id: 'not-important-not-urgent', name: 'Неважно & Несрочно', color: 'not-important-not-urgent' }
+];
+let currentTagForNewTask = 'important-urgent'; // Текущий тег для новой задачи
+let selectedTagFilter = null; // Фильтр для отображения задач
+// Переменные для drag and drop
+let draggedTask = null;
+let draggedTaskIndex = -1;
 // =============================================================================
 // DOM элементы
 // =============================================================================
@@ -1122,6 +1363,7 @@ const currentProgressDisplay = document.getElementById('currentProgressDisplay')
 const longBreakProgressBar = document.getElementById('longBreakProgressBar');
 const taskInput = document.getElementById('taskInput');
 const taskIntervalsInput = document.getElementById('taskIntervals');
+const intervalsLabel = document.getElementById('intervalsLabel');
 const addTaskBtn = document.getElementById('addTaskBtn');
 const taskListEl = document.getElementById('taskList');
 const currentTaskDisplay = document.getElementById('currentTaskDisplay');
@@ -1130,18 +1372,17 @@ const totalTimeEl = document.getElementById('totalTime');
 const tasksCompletedEl = document.getElementById('tasksCompleted');
 const taskProgressEl = document.getElementById('taskProgress');
 const completedIntervalsDisplay = document.getElementById('completedIntervalsDisplay');
-
+const tagSelector = document.getElementById('tagSelector');
+// Модальные окна
 const localNotification = document.getElementById('localNotification');
 const notificationTitle = document.getElementById('notificationTitle');
 const notificationMessage = document.getElementById('notificationMessage');
 const notificationStartBtn = document.getElementById('notificationStartBtn');
 const notificationLaterBtn = document.getElementById('notificationLaterBtn');
-
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsModal = document.getElementById('settingsModal');
 const closeSettings = document.getElementById('closeSettings');
 const saveSettingsBtn = document.getElementById('saveSettings');
-
 // =============================================================================
 // Инициализация
 // =============================================================================
@@ -1149,7 +1390,8 @@ resetTimer();
 checkNotificationPermission();
 updateModeButtons();
 updateLongBreakProgress();
-
+updateIntervalsLabel();
+initTagSelector();
 // =============================================================================
 // Обработчики событий
 // =============================================================================
@@ -1168,7 +1410,9 @@ settingsBtn.addEventListener('click', () => {
 });
 closeSettings.addEventListener('click', () => settingsModal.classList.remove('active'));
 saveSettingsBtn.addEventListener('click', saveSettingsHandler);
-
+// Обновление надписи "помидорок" при изменении значения
+taskIntervalsInput.addEventListener('input', updateIntervalsLabel);
+// Звуки
 document.querySelectorAll('.sound-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         setSoundCategory(btn.dataset.sound);
@@ -1176,12 +1420,121 @@ document.querySelectorAll('.sound-btn').forEach(btn => {
         btn.classList.add('active');
     });
 });
-
 workDurationInput.addEventListener('input', () => { if (!isRunning) resetTimer(); });
 shortBreakInput.addEventListener('input', () => { if (!isRunning) resetTimer(); });
 longBreakInput.addEventListener('input', () => { if (!isRunning) resetTimer(); });
 sessionsUntilLongBreakInput.addEventListener('input', updateLongBreakSettings);
-
+// =============================================================================
+// Вспомогательные функции для интерфейса
+// =============================================================================
+function initTagSelector() {
+    const tagButtons = tagSelector.querySelectorAll('.tag-selector-btn');
+    tagButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tag = btn.dataset.tag;
+            selectTagForNewTask(tag);
+        });
+    });
+}
+function selectTagForNewTask(tag) {
+    currentTagForNewTask = tag;
+   
+    // Обновляем кнопки выбора тегов
+    updateTagSelectorButtons();
+}
+function updateTagSelectorButtons() {
+    const tagButtons = tagSelector.querySelectorAll('.tag-selector-btn');
+    tagButtons.forEach(btn => {
+        if (btn.dataset.tag === currentTagForNewTask) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+function updateIntervalsLabel() {
+    const intervals = parseInt(taskIntervalsInput.value) || 1;
+    let label;
+   
+    if (intervals === 1) {
+        label = '1 помидорка';
+    } else if (intervals >= 2 && intervals <= 4) {
+        label = `${intervals} помидорки`;
+    } else {
+        label = `${intervals} помидорок`;
+    }
+   
+    intervalsLabel.textContent = label;
+}
+function showQuickNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--card-bg);
+        color: var(--text);
+        padding: 12px 20px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow-lg);
+        z-index: 9999;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideIn 0.3s ease;
+        backdrop-filter: blur(20px);
+    `;
+   
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+            <i class="fas fa-tag" style="color: ${getTagColor(currentTagForNewTask)}"></i>
+            <div>${message}</div>
+        </div>
+    `;
+   
+    document.body.appendChild(notification);
+   
+    // Удаляем уведомление через 2 секунды
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
+}
+function getTagColor(tagId) {
+    switch(tagId) {
+        case 'important-urgent': return '#FCA5A5';
+        case 'important-not-urgent': return '#A7F3D0';
+        case 'not-important-urgent': return '#FDE68A';
+        case 'not-important-not-urgent': return '#C4B5FD';
+        default: return 'var(--text-light)';
+    }
+}
+// Добавляем стили для анимации
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+   
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
 // =============================================================================
 // Таймер
 // =============================================================================
@@ -1191,26 +1544,24 @@ function getDuration() {
     if (mode === BREAK_LONG_MODE) return Number(longBreakInput.value) * 60 || 900;
     return 1500;
 }
-
 function setMode(newMode) {
     if (isRunning) pauseTimer();
     mode = (newMode === BREAK_LONG_MODE || newMode === BREAK_SHORT_MODE) ? newMode : WORK_MODE;
-    
+   
     // При смене режима полностью сбрасываем таймер
     remainingSeconds = 0;
     endTime = Date.now() + getDuration() * 1000;
     updateDisplay(getDuration());
     updateProgressRing(0);
-    
+   
     updateModeIndicator();
     updateModeButtons();
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
 }
-
 function startTimer() {
     if (isRunning) return;
     isRunning = true;
-    
+   
     // Если таймер был на паузе, продолжаем с сохраненного времени
     // Иначе начинаем с полной длительности
     if (remainingSeconds > 0) {
@@ -1219,24 +1570,18 @@ function startTimer() {
         endTime = Date.now() + getDuration() * 1000;
         remainingSeconds = getDuration();
     }
-
     startBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${mode === WORK_MODE ? 'В процессе' : 'Отдых'}`;
     startBtn.disabled = true;
-
     if (currentSoundCategory !== 'none' && !isSoundPlaying) playBackgroundSound();
-
     tick();
     timerId = setInterval(tick, 980);
 }
-
 function tick() {
     if (!isRunning) return;
     const remainingMs = Math.max(0, endTime - Date.now());
     remainingSeconds = Math.round(remainingMs / 1000);
-
     updateDisplay(remainingSeconds);
     updateProgressRing((getDuration() - remainingSeconds) / getDuration());
-
     if (mode === WORK_MODE) {
         const minWorked = Math.floor((getDuration() - remainingSeconds) / 60);
         if (minWorked > totalTimeWorked) {
@@ -1244,24 +1589,21 @@ function tick() {
             updateStats();
         }
     }
-
     if (remainingMs <= 0) handleSessionEnd();
 }
-
 function pauseTimer() {
     if (!isRunning) return;
     isRunning = false;
     clearInterval(timerId);
     timerId = null;
-    
+   
     // Сохраняем оставшееся время для возобновления
     const remainingMs = Math.max(0, endTime - Date.now());
     remainingSeconds = Math.round(remainingMs / 1000);
-    
+   
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Продолжить' : 'Продолжить отдых'}`;
     startBtn.disabled = false;
 }
-
 function resetTimer() {
     pauseTimer();
     // Полностью сбрасываем оставшееся время
@@ -1272,26 +1614,20 @@ function resetTimer() {
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
     startBtn.disabled = false;
 }
-
 function handleSessionEnd() {
     clearInterval(timerId);
     timerId = null;
     isRunning = false;
     remainingSeconds = 0; // Сбрасываем при завершении сессии
-
     playAlertSound();
-
     if (mode === WORK_MODE) {
         sessionsCompleted++;
         currentTaskIntervalsCompleted++;
         updateTaskProgress();
         updateLongBreakProgress();
-
         if (isSoundPlaying) pauseBackgroundSound();
-
         const needed = Number(sessionsUntilLongBreakInput.value) || 4;
         const isLong = sessionsCompleted % needed === 0;
-
         showNotification(
             isLong ? 'Длинный перерыв!' : 'Короткий перерыв',
             isLong
@@ -1299,7 +1635,6 @@ function handleSessionEnd() {
                 : `Перерыв. До длинного осталось ${needed - (sessionsCompleted % needed)} сессий.`,
             'break'
         );
-
         setTimeout(() => setMode(isLong ? BREAK_LONG_MODE : BREAK_SHORT_MODE), 800);
     } else {
         showNotification(
@@ -1309,11 +1644,9 @@ function handleSessionEnd() {
         );
         setTimeout(() => setMode(WORK_MODE), 800);
     }
-
     startBtn.disabled = false;
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
 }
-
 // =============================================================================
 // Уведомления
 // =============================================================================
@@ -1321,7 +1654,6 @@ function showNotification(title, msg, type = 'info') {
     notificationTitle.textContent = title;
     notificationMessage.textContent = msg;
     localNotification.classList.add('show');
-
     if (type === 'break') {
         modeIndicator.classList.remove('work');
         modeIndicator.classList.add('break');
@@ -1329,23 +1661,18 @@ function showNotification(title, msg, type = 'info') {
         modeIndicator.classList.remove('break');
         modeIndicator.classList.add('work');
     }
-
     setTimeout(() => localNotification.classList.remove('show'), 10000);
-
     if (notificationPermission) {
         new Notification(title, { body: msg });
     }
 }
-
 function hideLocalNotification() {
     localNotification.classList.remove('show');
 }
-
 function startFromNotification() {
     hideLocalNotification();
     startTimer();
 }
-
 // =============================================================================
 // Звуки
 // =============================================================================
@@ -1355,7 +1682,6 @@ function playAlertSound() {
     snd.volume = 0.7;
     snd.play().catch(e => console.log("Звук не воспроизведён", e));
 }
-
 function playBackgroundSound() {
     stopAllBackgroundSounds();
     const audio = document.getElementById(currentSoundCategory + '-track');
@@ -1365,7 +1691,6 @@ function playBackgroundSound() {
         isSoundPlaying = true;
     }
 }
-
 function pauseBackgroundSound() {
     const audio = document.getElementById(currentSoundCategory + '-track');
     if (audio) {
@@ -1373,99 +1698,308 @@ function pauseBackgroundSound() {
         isSoundPlaying = false;
     }
 }
-
 function stopAllBackgroundSounds() {
-    ['lofi','rain','forest'].forEach(s => {
+    ['fire','rain','forest'].forEach(s => {
         const a = document.getElementById(s + '-track');
         if (a) { a.pause(); a.currentTime = 0; }
     });
     isSoundPlaying = false;
 }
-
 function setSoundCategory(cat) {
     pauseBackgroundSound();
     currentSoundCategory = cat;
     if (isRunning && cat !== 'none') playBackgroundSound();
 }
-
 // =============================================================================
-// Задачи
+// Задачи с комментариями и перетаскиванием
 // =============================================================================
 function addTask() {
     const text = taskInput.value.trim();
     const intervals = Number(taskIntervalsInput.value) || 1;
     if (!text) return;
-
     const task = {
         id: Date.now(),
-        text,
+        text: text,
         intervals,
+        tags: [currentTagForNewTask], // Используем текущий выбранный тег
         completedIntervals: 0,
-        completed: false
+        completed: false,
+        comment: '' // Добавляем поле для комментария
     };
-
     tasks.push(task);
     renderTaskList();
     taskInput.value = '';
     taskInput.focus();
-
     if (currentTaskIndex === -1) selectTask(tasks.length - 1);
+   
+    // Показываем подтверждение
+    const tagName = availableTags.find(t => t.id === currentTagForNewTask)?.name || currentTagForNewTask;
+    showQuickNotification(`Задача добавлена с тегом: ${tagName}`);
 }
-
 function renderTaskList() {
     taskListEl.innerHTML = '';
-
-    if (tasks.length === 0) {
-        taskListEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-light);">Нет задач</div>';
+    // Фильтрация задач по выбранному фильтру
+    let filteredTasks = tasks;
+    if (selectedTagFilter) {
+        filteredTasks = tasks.filter(task =>
+            task.tags && task.tags.includes(selectedTagFilter)
+        );
+    }
+    if (filteredTasks.length === 0) {
+        taskListEl.innerHTML = `
+            <div style="padding:20px; text-align:center; color:var(--text-light);">
+                <i class="fas fa-tasks" style="font-size:20px; margin-bottom:10px; display:block;"></i>
+                ${selectedTagFilter ? 'Нет задач в этой категории' : 'Нет задач'}<br>
+                <small style="font-size:11px;">Добавьте задачу, чтобы начать работать</small>
+            </div>
+        `;
         return;
     }
-
-    tasks.forEach((task, i) => {
+    filteredTasks.forEach((task, i) => {
+        // Находим оригинальный индекс задачи в основном массиве
+        const originalIndex = tasks.findIndex(t => t.id === task.id);
+        const isActive = originalIndex === currentTaskIndex;
+       
         const item = document.createElement('div');
-        item.className = `task-item ${i === currentTaskIndex ? 'active' : ''}`;
-
+        item.className = `task-item ${isActive ? 'active' : ''}`;
+        item.dataset.id = task.id;
+        item.dataset.index = originalIndex;
+        item.draggable = true;
+        const tagInfo = availableTags.find(t => t.id === task.tags[0]) || availableTags[0];
         item.innerHTML = `
+            <div class="drag-handle">
+                <i class="fas fa-grip-vertical"></i>
+            </div>
             <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTaskCompletion(${task.id})"></div>
             <div class="task-content">
                 <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
-                <div class="task-intervals-badge">${task.completedIntervals}/${task.intervals}</div>
+                ${task.comment ? `<div class="task-comment show">${task.comment}</div>` : ''}
+                <textarea class="comment-input" placeholder="Добавить комментарий..." style="display:none;">${task.comment || ''}</textarea>
+                <div class="comment-actions" style="display:none;">
+                    <button class="comment-btn-small save" onclick="saveComment(${task.id})">Сохранить</button>
+                    <button class="comment-btn-small cancel" onclick="cancelComment(${task.id})">Отмена</button>
+                </div>
+                <div class="task-meta">
+                    <div class="task-intervals-badge">${task.completedIntervals}/${task.intervals}</div>
+                    <div class="task-tags">
+                        <span class="task-tag ${tagInfo.color} ${currentTagForNewTask === task.tags[0] ? 'active' : ''}"
+                              onclick="event.stopPropagation(); changeTaskTag(${task.id})">${tagInfo.name}</span>
+                    </div>
+                </div>
             </div>
             <div class="task-actions">
+                <button class="task-btn comment-btn" onclick="toggleCommentInput(${task.id})">
+                    <i class="fas fa-comment${task.comment ? '-dots' : ''}"></i>
+                </button>
                 <button class="task-btn delete" onclick="deleteTask(${task.id})"><i class="fas fa-trash"></i></button>
             </div>
         `;
-
+        // Событие клика для выбора задачи
         item.addEventListener('click', e => {
-            if (!e.target.closest('.task-checkbox') && !e.target.closest('.task-btn')) {
-                selectTask(i);
+            if (!e.target.closest('.task-checkbox') &&
+                !e.target.closest('.task-btn') &&
+                !e.target.closest('.task-tag') &&
+                !e.target.closest('.drag-handle') &&
+                !e.target.closest('.comment-input') &&
+                !e.target.closest('.comment-actions')) {
+                selectTask(originalIndex);
             }
         });
-
+        // Drag and drop события
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('dragover', handleDragOver);
+        item.addEventListener('dragleave', handleDragLeave);
+        item.addEventListener('drop', handleDrop);
+        item.addEventListener('dragend', handleDragEnd);
         taskListEl.appendChild(item);
     });
 }
-
+// Функции для комментариев
+window.toggleCommentInput = function(taskId) {
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) return;
+   
+    const taskItem = document.querySelector(`.task-item[data-id="${taskId}"]`);
+    if (!taskItem) return;
+   
+    const commentInput = taskItem.querySelector('.comment-input');
+    const commentActions = taskItem.querySelector('.comment-actions');
+    const commentDisplay = taskItem.querySelector('.task-comment');
+   
+    if (commentInput.style.display === 'block') {
+        // Закрываем редактор комментария
+        commentInput.style.display = 'none';
+        commentActions.style.display = 'none';
+        if (tasks[taskIndex].comment && commentDisplay) {
+            commentDisplay.style.display = 'block';
+        }
+    } else {
+        // Открываем редактор комментария
+        commentInput.value = tasks[taskIndex].comment || '';
+        commentInput.style.display = 'block';
+        commentActions.style.display = 'flex';
+        if (commentDisplay) {
+            commentDisplay.style.display = 'none';
+        }
+        commentInput.focus();
+    }
+};
+window.saveComment = function(taskId) {
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) return;
+   
+    const taskItem = document.querySelector(`.task-item[data-id="${taskId}"]`);
+    if (!taskItem) return;
+   
+    const commentInput = taskItem.querySelector('.comment-input');
+    tasks[taskIndex].comment = commentInput.value.trim();
+   
+    // Обновляем отображение
+    renderTaskList();
+   
+    // Показываем уведомление
+    if (tasks[taskIndex].comment) {
+        showQuickNotification('Комментарий сохранен');
+    }
+};
+window.cancelComment = function(taskId) {
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) return;
+   
+    const taskItem = document.querySelector(`.task-item[data-id="${taskId}"]`);
+    if (!taskItem) return;
+   
+    const commentInput = taskItem.querySelector('.comment-input');
+    commentInput.value = tasks[taskIndex].comment || '';
+   
+    // Закрываем редактор
+    commentInput.style.display = 'none';
+    taskItem.querySelector('.comment-actions').style.display = 'none';
+   
+    if (tasks[taskIndex].comment) {
+        const commentDisplay = taskItem.querySelector('.task-comment');
+        if (commentDisplay) {
+            commentDisplay.style.display = 'block';
+        }
+    }
+};
+// Функция изменения тега задачи
+window.changeTaskTag = function(taskId) {
+    const taskIndex = tasks.findIndex(t => t.id === taskId);
+    if (taskIndex === -1) return;
+   
+    // Получаем следующий тег из списка
+    const currentTag = tasks[taskIndex].tags[0];
+    const currentTagIndex = availableTags.findIndex(t => t.id === currentTag);
+    const nextTagIndex = (currentTagIndex + 1) % availableTags.length;
+    const nextTag = availableTags[nextTagIndex];
+   
+    tasks[taskIndex].tags = [nextTag.id];
+   
+    // Обновляем отображение
+    renderTaskList();
+   
+    // Если это текущая задача, обновляем ее отображение
+    if (taskIndex === currentTaskIndex) {
+        selectTask(taskIndex);
+    }
+   
+    // Показываем уведомление
+    showQuickNotification(`Тег задачи изменен на: ${nextTag.name}`);
+};
+// Функции для drag and drop
+function handleDragStart(e) {
+    draggedTask = this;
+    draggedTaskIndex = parseInt(this.dataset.index);
+    this.classList.add('dragging');
+   
+    // Устанавливаем данные для переноса
+    e.dataTransfer.setData('text/plain', this.dataset.id);
+    e.dataTransfer.effectAllowed = 'move';
+}
+function handleDragOver(e) {
+    e.preventDefault();
+    this.classList.add('drag-over');
+    e.dataTransfer.dropEffect = 'move';
+}
+function handleDragLeave() {
+    this.classList.remove('drag-over');
+}
+function handleDrop(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+   
+    const draggedId = e.dataTransfer.getData('text/plain');
+    const targetId = this.dataset.id;
+   
+    if (draggedId === targetId) return;
+   
+    const draggedIndex = tasks.findIndex(t => t.id === parseInt(draggedId));
+    const targetIndex = tasks.findIndex(t => t.id === parseInt(targetId));
+   
+    if (draggedIndex === -1 || targetIndex === -1) return;
+   
+    // Перемещаем задачу в массиве
+    const [draggedItem] = tasks.splice(draggedIndex, 1);
+    tasks.splice(targetIndex, 0, draggedItem);
+   
+    // Обновляем индексы текущей задачи
+    if (currentTaskIndex === draggedIndex) {
+        currentTaskIndex = targetIndex;
+    } else if (currentTaskIndex === targetIndex) {
+        currentTaskIndex = draggedIndex;
+    }
+   
+    // Перерисовываем список
+    renderTaskList();
+   
+    // Показываем уведомление
+    showQuickNotification('Задача перемещена');
+}
+function handleDragEnd() {
+    this.classList.remove('dragging');
+    document.querySelectorAll('.task-item').forEach(item => {
+        item.classList.remove('drag-over');
+    });
+    draggedTask = null;
+    draggedTaskIndex = -1;
+}
+// Функция фильтрации задач по тегу
+window.filterTasksByTag = function(tag) {
+    if (selectedTagFilter === tag) {
+        // Если уже фильтруем по этому тегу, сбрасываем фильтр
+        selectedTagFilter = null;
+    } else {
+        // Устанавливаем фильтр
+        selectedTagFilter = tag;
+    }
+   
+    renderTaskList();
+   
+    // Показываем уведомление о фильтрации
+    if (selectedTagFilter) {
+        const tagName = availableTags.find(t => t.id === tag)?.name || tag;
+        showQuickNotification(`Показаны задачи с тегом: ${tagName}`);
+    } else {
+        showQuickNotification('Показаны все задачи');
+    }
+};
 window.toggleTaskCompletion = function(id) {
     const idx = tasks.findIndex(t => t.id === id);
     if (idx === -1) return;
-
     tasks[idx].completed = !tasks[idx].completed;
     if (tasks[idx].completed) tasksCompleted++;
     else tasksCompleted--;
-
     updateStats();
     renderTaskList();
-
     if (idx === currentTaskIndex && tasks[idx].completed) {
         const next = findNextIncompleteTask();
         if (next !== -1) selectTask(next);
     }
 };
-
 window.deleteTask = function(id) {
     const idx = tasks.findIndex(t => t.id === id);
     if (idx === -1) return;
-
     if (tasks[idx].completed) tasksCompleted--;
     if (idx === currentTaskIndex) {
         const next = findNextIncompleteTask(idx);
@@ -1476,58 +2010,77 @@ window.deleteTask = function(id) {
         tasks.splice(idx, 1);
         if (currentTaskIndex > idx) currentTaskIndex--;
     }
-
     renderTaskList();
     updateStats();
-
     if (currentTaskIndex === -1) {
         currentTaskDisplay.classList.add('empty');
         currentTaskDisplay.textContent = 'Текущая задача отсутствует';
         taskProgressEl.style.display = 'none';
     }
 };
-
 function selectTask(index) {
     if (index < 0 || index >= tasks.length) return;
     currentTaskIndex = index;
     const t = tasks[index];
-
-    currentTaskDisplay.innerHTML = `${t.text} <span class="task-intervals" style="color: var(--primary-light); font-weight: 600; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 10px;">${t.completedIntervals}/${t.intervals}</span>`;
+    const tagInfo = availableTags.find(tag => tag.id === t.tags[0]) || availableTags[0];
+    currentTaskDisplay.innerHTML = `
+        ${t.text}
+        <span class="task-intervals" style="color: var(--primary-light); font-weight: 600; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 10px;">
+            ${t.completedIntervals}/${t.intervals}
+        </span>
+        <span class="task-tag ${tagInfo.color}" style="font-size: 10px; margin-left: 5px;">
+            ${tagInfo.name}
+        </span>
+        ${t.comment ? `<div style="font-size:12px; color:var(--text-light); margin-top:5px;"><i class="fas fa-comment"></i> ${t.comment}</div>` : ''}
+    `;
     currentTaskDisplay.classList.remove('empty');
-
     currentTaskIntervalsCompleted = t.completedIntervals;
     currentTaskTotalIntervals = t.intervals;
     updateTaskProgress();
     taskProgressEl.style.display = 'flex';
-
-    document.querySelectorAll('.task-item').forEach((el,i) => el.classList.toggle('active', i === index));
+    // Обновляем активные элементы в списке
+    document.querySelectorAll('.task-item').forEach((el,i) => {
+        const taskId = el.dataset.id;
+        if (taskId) {
+            const taskIndex = tasks.findIndex(t => t.id === parseInt(taskId));
+            el.classList.toggle('active', taskIndex === index);
+        }
+    });
 }
-
 function updateTaskProgress() {
     completedIntervalsDisplay.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
-
     if (currentTaskIndex === -1) return;
-
     tasks[currentTaskIndex].completedIntervals = currentTaskIntervalsCompleted;
-
     // Обновляем бейдж в списке
     const items = taskListEl.querySelectorAll('.task-item');
-    if (items[currentTaskIndex]) {
-        const badge = items[currentTaskIndex].querySelector('.task-intervals-badge');
-        if (badge) badge.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
-    }
-
+    items.forEach(item => {
+        const taskId = item.dataset.id;
+        if (taskId && parseInt(taskId) === tasks[currentTaskIndex].id) {
+            const badge = item.querySelector('.task-intervals-badge');
+            if (badge) badge.textContent = `${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}`;
+        }
+    });
     // Обновляем текущую задачу сверху
     if (!currentTaskDisplay.classList.contains('empty')) {
-        currentTaskDisplay.innerHTML = `${tasks[currentTaskIndex].text} <span class="task-intervals" style="color: var(--primary-light); font-weight: 600; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 10px;">${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}</span>`;
+        const t = tasks[currentTaskIndex];
+        const tagInfo = availableTags.find(tag => tag.id === t.tags[0]) || availableTags[0];
+       
+        currentTaskDisplay.innerHTML = `
+            ${t.text}
+            <span class="task-intervals" style="color: var(--primary-light); font-weight: 600; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 10px;">
+                ${currentTaskIntervalsCompleted}/${currentTaskTotalIntervals}
+            </span>
+            <span class="task-tag ${tagInfo.color}" style="font-size: 10px; margin-left: 5px;">
+                ${tagInfo.name}
+            </span>
+            ${t.comment ? `<div style="font-size:12px; color:var(--text-light); margin-top:5px;"><i class="fas fa-comment"></i> ${t.comment}</div>` : ''}
+        `;
     }
-
     if (currentTaskIntervalsCompleted >= currentTaskTotalIntervals) {
         tasks[currentTaskIndex].completed = true;
         tasksCompleted++;
         updateStats();
         renderTaskList();
-
         const next = findNextIncompleteTask();
         if (next !== -1) selectTask(next);
         else {
@@ -1538,7 +2091,6 @@ function updateTaskProgress() {
         }
     }
 }
-
 function findNextIncompleteTask(start = 0) {
     for (let i = start; i < tasks.length; i++) {
         if (!tasks[i].completed) return i;
@@ -1548,7 +2100,6 @@ function findNextIncompleteTask(start = 0) {
     }
     return -1;
 }
-
 // =============================================================================
 // Вспомогательные функции
 // =============================================================================
@@ -1557,13 +2108,11 @@ function updateDisplay(seconds) {
     const s = (seconds % 60).toString().padStart(2, '0');
     display.textContent = `${m}:${s}`;
 }
-
 function updateProgressRing(progress) {
     const circumference = 2 * Math.PI * 100;
     const offset = circumference - (progress * circumference);
     progressRing.style.strokeDashoffset = offset;
 }
-
 function updateModeIndicator() {
     modeIndicator.textContent = mode === WORK_MODE ? 'Работа' : 'Перерыв';
     if (mode === WORK_MODE) {
@@ -1574,18 +2123,15 @@ function updateModeIndicator() {
         modeIndicator.classList.add('break');
     }
 }
-
 function updateModeButtons() {
     workModeBtn.classList.toggle('active', mode === WORK_MODE);
     breakModeBtn.classList.toggle('active', mode !== WORK_MODE);
 }
-
 function updateStats() {
     completedSessionsEl.textContent = sessionsCompleted;
     totalTimeEl.textContent = totalTimeWorked;
     tasksCompletedEl.textContent = tasksCompleted;
 }
-
 function checkNotificationPermission() {
     if (!("Notification" in window)) return;
     if (Notification.permission === "granted") {
@@ -1596,25 +2142,21 @@ function checkNotificationPermission() {
         });
     }
 }
-
 function updateLongBreakProgress() {
     const needed = Number(sessionsUntilLongBreakInput.value) || 4;
     const progress = sessionsCompleted % needed;
     currentProgressDisplay.textContent = `${progress}/${needed}`;
     longBreakProgressBar.style.width = `${(progress / needed) * 100}%`;
 }
-
 function updateLongBreakSettings() {
     sessionsUntilLongBreak = Number(sessionsUntilLongBreakInput.value) || 4;
     updateLongBreakProgress();
 }
-
 function saveSettingsHandler() {
     updateLongBreakSettings();
     settingsModal.classList.remove('active');
     if (!isRunning) resetTimer();
 }
-
 // =============================================================================
 // Старт
 // =============================================================================
