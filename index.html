@@ -1100,6 +1100,9 @@ let currentSoundCategory = 'none';
 let isSoundPlaying = false;
 let notificationPermission = false;
 
+// Новая переменная для хранения оставшегося времени при паузе
+let remainingSeconds = 0;
+
 // =============================================================================
 // DOM элементы
 // =============================================================================
@@ -1192,7 +1195,13 @@ function getDuration() {
 function setMode(newMode) {
     if (isRunning) pauseTimer();
     mode = (newMode === BREAK_LONG_MODE || newMode === BREAK_SHORT_MODE) ? newMode : WORK_MODE;
-    resetTimer();
+    
+    // При смене режима полностью сбрасываем таймер
+    remainingSeconds = 0;
+    endTime = Date.now() + getDuration() * 1000;
+    updateDisplay(getDuration());
+    updateProgressRing(0);
+    
     updateModeIndicator();
     updateModeButtons();
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
@@ -1201,7 +1210,15 @@ function setMode(newMode) {
 function startTimer() {
     if (isRunning) return;
     isRunning = true;
-    endTime = Date.now() + getDuration() * 1000;
+    
+    // Если таймер был на паузе, продолжаем с сохраненного времени
+    // Иначе начинаем с полной длительности
+    if (remainingSeconds > 0) {
+        endTime = Date.now() + remainingSeconds * 1000;
+    } else {
+        endTime = Date.now() + getDuration() * 1000;
+        remainingSeconds = getDuration();
+    }
 
     startBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${mode === WORK_MODE ? 'В процессе' : 'Отдых'}`;
     startBtn.disabled = true;
@@ -1215,13 +1232,13 @@ function startTimer() {
 function tick() {
     if (!isRunning) return;
     const remainingMs = Math.max(0, endTime - Date.now());
-    const remaining = Math.round(remainingMs / 1000);
+    remainingSeconds = Math.round(remainingMs / 1000);
 
-    updateDisplay(remaining);
-    updateProgressRing((getDuration() - remaining) / getDuration());
+    updateDisplay(remainingSeconds);
+    updateProgressRing((getDuration() - remainingSeconds) / getDuration());
 
     if (mode === WORK_MODE) {
-        const minWorked = Math.floor((getDuration() - remaining) / 60);
+        const minWorked = Math.floor((getDuration() - remainingSeconds) / 60);
         if (minWorked > totalTimeWorked) {
             totalTimeWorked = minWorked;
             updateStats();
@@ -1236,12 +1253,19 @@ function pauseTimer() {
     isRunning = false;
     clearInterval(timerId);
     timerId = null;
+    
+    // Сохраняем оставшееся время для возобновления
+    const remainingMs = Math.max(0, endTime - Date.now());
+    remainingSeconds = Math.round(remainingMs / 1000);
+    
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Продолжить' : 'Продолжить отдых'}`;
     startBtn.disabled = false;
 }
 
 function resetTimer() {
     pauseTimer();
+    // Полностью сбрасываем оставшееся время
+    remainingSeconds = 0;
     endTime = Date.now() + getDuration() * 1000;
     updateDisplay(getDuration());
     updateProgressRing(0);
@@ -1253,6 +1277,7 @@ function handleSessionEnd() {
     clearInterval(timerId);
     timerId = null;
     isRunning = false;
+    remainingSeconds = 0; // Сбрасываем при завершении сессии
 
     playAlertSound();
 
