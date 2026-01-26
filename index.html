@@ -1400,6 +1400,8 @@ updateModeButtons();
 updateLongBreakProgress();
 updateIntervalsLabel();
 initTagSelector();
+// Инициализация звуков
+initSounds();
 // =============================================================================
 // Обработчики событий
 // =============================================================================
@@ -1665,27 +1667,52 @@ function handleSessionEnd() {
 // =============================================================================
 // Звуки (ДОБАВЛЕНА НОВАЯ ФУНКЦИЯ)
 // =============================================================================
+function initSounds() {
+    // Предзагрузка звуков
+    const sounds = ['work-end-sound', 'break-end-sound', 'time-end-alert'];
+    sounds.forEach(soundId => {
+        const audio = document.getElementById(soundId);
+        if (audio) {
+            audio.load();
+            audio.volume = 0.7;
+        }
+    });
+}
 function playTimeEndAlert() {
     const alertSound = document.getElementById('time-end-alert');
     if (alertSound) {
-        alertSound.currentTime = 0;
-        alertSound.volume = 0.7;
-        alertSound.play().catch(e => console.log("Звук окончания времени не воспроизведён", e));
+        try {
+            alertSound.currentTime = 0;
+            alertSound.volume = 0.7;
+            alertSound.play().catch(e => console.log("Звук окончания времени не воспроизведён:", e));
+        } catch (error) {
+            console.log("Ошибка воспроизведения звука:", error);
+        }
     }
 }
 function playAlertSound(id) {
     const snd = document.getElementById(id);
-    snd.currentTime = 0;
-    snd.volume = 0.7;
-    snd.play().catch(e => console.log("Звук не воспроизведён", e));
+    if (snd) {
+        try {
+            snd.currentTime = 0;
+            snd.volume = 0.7;
+            snd.play().catch(e => console.log("Звук не воспроизведён:", e));
+        } catch (error) {
+            console.log("Ошибка воспроизведения звука:", error);
+        }
+    }
 }
 function playBackgroundSound() {
     stopAllBackgroundSounds();
     const audio = document.getElementById(currentSoundCategory + '-track');
     if (audio) {
-        audio.volume = 0.3;
-        audio.play().catch(() => {});
-        isSoundPlaying = true;
+        try {
+            audio.volume = 0.3;
+            audio.play().catch(() => {});
+            isSoundPlaying = true;
+        } catch (error) {
+            console.log("Ошибка воспроизведения фонового звука:", error);
+        }
     }
 }
 function pauseBackgroundSound() {
