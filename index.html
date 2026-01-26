@@ -1311,6 +1311,10 @@
 <audio id="forest-track" loop preload="none">
     <source src="https://cdn.pixabay.com/audio/2022/05/25/audio_f3b2c1e8d3.mp3" type="audio/mpeg">
 </audio>
+<!-- ДОБАВЛЕНО: Звук окончания времени -->
+<audio id="time-end-alert" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-musical-reveal-961.mp3" type="audio/mpeg">
+</audio>
 <script>
 // =============================================================================
 // Основные переменные
@@ -1333,6 +1337,7 @@ let currentTaskTotalIntervals = 1;
 let currentSoundCategory = 'none';
 let isSoundPlaying = false;
 let notificationPermission = false;
+let timeEndSoundEnabled = true; // Новая переменная: включены ли звуковые уведомления
 // Новая переменная для хранения оставшегося времени при паузе
 let remainingSeconds = 0;
 // Теги для задач
@@ -1622,6 +1627,12 @@ function handleSessionEnd() {
     timerId = null;
     isRunning = false;
     remainingSeconds = 0; // Сбрасываем при завершении сессии
+    
+    // ВОСПРОИЗВЕДЕНИЕ ЗВУКА ОКОНЧАНИЯ ВРЕМЕНИ
+    if (timeEndSoundEnabled) {
+        playTimeEndAlert();
+    }
+    
     if (mode === WORK_MODE) {
         playAlertSound('work-end-sound');
         sessionsCompleted++;
@@ -1652,34 +1663,16 @@ function handleSessionEnd() {
     startBtn.innerHTML = `<i class="fas fa-play"></i> ${mode === WORK_MODE ? 'Старт' : 'Начать отдых'}`;
 }
 // =============================================================================
-// Уведомления
+// Звуки (ДОБАВЛЕНА НОВАЯ ФУНКЦИЯ)
 // =============================================================================
-function showNotification(title, msg, type = 'info') {
-    notificationTitle.textContent = title;
-    notificationMessage.textContent = msg;
-    localNotification.classList.add('show');
-    if (type === 'break') {
-        modeIndicator.classList.remove('work');
-        modeIndicator.classList.add('break');
-    } else {
-        modeIndicator.classList.remove('break');
-        modeIndicator.classList.add('work');
-    }
-    setTimeout(() => localNotification.classList.remove('show'), 10000);
-    if (notificationPermission) {
-        new Notification(title, { body: msg });
+function playTimeEndAlert() {
+    const alertSound = document.getElementById('time-end-alert');
+    if (alertSound) {
+        alertSound.currentTime = 0;
+        alertSound.volume = 0.7;
+        alertSound.play().catch(e => console.log("Звук окончания времени не воспроизведён", e));
     }
 }
-function hideLocalNotification() {
-    localNotification.classList.remove('show');
-}
-function startFromNotification() {
-    hideLocalNotification();
-    startTimer();
-}
-// =============================================================================
-// Звуки
-// =============================================================================
 function playAlertSound(id) {
     const snd = document.getElementById(id);
     snd.currentTime = 0;
@@ -1713,6 +1706,32 @@ function setSoundCategory(cat) {
     pauseBackgroundSound();
     currentSoundCategory = cat;
     if (isRunning && cat !== 'none') playBackgroundSound();
+}
+// =============================================================================
+// Уведомления
+// =============================================================================
+function showNotification(title, msg, type = 'info') {
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = msg;
+    localNotification.classList.add('show');
+    if (type === 'break') {
+        modeIndicator.classList.remove('work');
+        modeIndicator.classList.add('break');
+    } else {
+        modeIndicator.classList.remove('break');
+        modeIndicator.classList.add('work');
+    }
+    setTimeout(() => localNotification.classList.remove('show'), 10000);
+    if (notificationPermission) {
+        new Notification(title, { body: msg });
+    }
+}
+function hideLocalNotification() {
+    localNotification.classList.remove('show');
+}
+function startFromNotification() {
+    hideLocalNotification();
+    startTimer();
 }
 // =============================================================================
 // Задачи с комментариями и перетаскиванием
