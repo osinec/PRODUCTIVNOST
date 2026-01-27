@@ -61,7 +61,7 @@ header{
   transition:box-shadow var(--transition), transform var(--transition);
   display:flex;
   flex-direction:column;
-  min-height:150px; /* стандартный размер на ПК */
+  min-height:150px; /* стартовый размер на ПК */
 }
 
 .quadrant:hover{
@@ -272,13 +272,13 @@ button{
 /* Мобильная адаптация */
 @media(max-width:768px){
   .board{
-    grid-template-columns:1fr; /* одна колонка */
+    grid-template-columns:1fr;
     gap:12px;
     padding:12px;
   }
   .quadrant{
     padding:14px;
-    min-height:80px; /* уменьшенный стартовый размер */
+    min-height:80px; /* одинаковый стартовый размер для всех */
     flex:0 1 auto;
   }
   .pomodoro{
