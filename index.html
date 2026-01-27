@@ -277,7 +277,8 @@ button{
   }
   .quadrant{
     padding:16px;
-    min-height:200px; /* минимальная высота */
+    min-height:180px; /* одинаковая изначальная высота */
+    flex:1 1 auto;
   }
   .pomodoro{
     display:flex;
@@ -355,7 +356,6 @@ button{
 </div>
 
 <script>
-/* Drag & drop, создание и редактирование задач */
 let activeQuadrant=null, editingNote=null, draggedNote=null;
 let timerInterval=null, remaining=0, mode='work', finished=false;
 const beep = new Audio("https://www.soundjay.com/button/beep-07.wav");
