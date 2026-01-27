@@ -22,7 +22,7 @@
 body{
   display:flex;
   flex-direction:column;
-  height:100vh;
+  min-height:100vh;
   color:var(--text);
   transition: background var(--transition);
   background-color:#0d0f1f;
@@ -56,9 +56,11 @@ header{
   background:var(--panel);
   border-radius:24px;
   padding:18px;
-  overflow-y:auto;
+  overflow:auto;
   box-shadow:0 8px 28px rgba(0,0,0,0.4);
   transition:box-shadow var(--transition), transform var(--transition);
+  display:flex;
+  flex-direction:column;
 }
 
 .quadrant:hover{
@@ -275,6 +277,7 @@ button{
   }
   .quadrant{
     padding:16px;
+    min-height:200px; /* минимальная высота */
   }
   .pomodoro{
     display:flex;
