@@ -5,7 +5,6 @@
 <title>Матрица Эйзенхауэра</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
 :root{
 --bg:#0e1024;
@@ -15,186 +14,36 @@
 --muted:#b9c0ff;
 --accent:#6c63ff;
 }
-
 *{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:Inter,sans-serif;
-background:radial-gradient(circle at top,#1b1f55,#0e1024);
-color:var(--text);
-display:flex;
-flex-direction:column;
-height:100vh;
-}
-
-header{
-padding:16px;
-text-align:center;
-font-size:22px;
-font-weight:600;
-}
-
-/* BOARD */
-.board{
-flex:1;
-display:grid;
-grid-template-columns:1fr 1fr;
-grid-template-rows:1fr 1fr;
-gap:14px;
-padding:14px;
-}
-
-.quadrant{
---q:#999;
-background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);
-border:1px solid var(--border);
-border-radius:18px;
-padding:14px;
-overflow-y:auto;
-position:relative;
-}
-
+body{margin:0;font-family:Inter,sans-serif;background:radial-gradient(circle at top,#1b1f55,#0e1024);color:var(--text);display:flex;flex-direction:column;height:100vh;}
+header{padding:16px;text-align:center;font-size:22px;font-weight:600;}
+.board{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;padding:14px;}
+.quadrant{--q:#999;background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);border:1px solid var(--border);border-radius:18px;padding:14px;overflow-y:auto;position:relative;}
 .q1{--q:#ff6b6b}
 .q2{--q:#4dabff}
 .q3{--q:#ffd166}
 .q4{--q:#6ee7b7}
-
-.quadrant::before{
-content:'';
-position:absolute;
-left:0;top:0;bottom:0;
-width:5px;
-background:var(--q);
-border-radius:18px 0 0 18px;
-}
-
-.quadrant.drag-over{
-outline:2px dashed var(--q);
-background:rgba(255,255,255,.06);
-}
-
-h2{
-margin:0 0 10px;
-font-size:15px;
-color:var(--q);
-}
-
-/* NOTE */
-.note{
-background:color-mix(in srgb, var(--q) 30%, white);
-color:#222;
-padding:10px 12px;
-border-radius:14px;
-margin-bottom:10px;
-cursor:grab;
-box-shadow:0 8px 18px rgba(0,0,0,.25);
-}
-
-.note-time{
-font-size:12px;
-opacity:.7;
-margin-top:4px;
-}
-
-.tags{
-display:flex;
-flex-wrap:wrap;
-gap:4px;
-margin-top:6px;
-}
-
-.tag{
-background:#00000055;
-color:#fff;
-font-size:11px;
-padding:2px 6px;
-border-radius:6px;
-}
-
-/* MODAL */
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.65);
-display:none;
-align-items:center;
-justify-content:center;
-z-index:10;
-}
-
-.modal-content{
-background:var(--panel);
-padding:18px;
-width:340px;
-border-radius:18px;
-border:1px solid var(--border);
-}
-
-label{
-font-size:12px;
-color:var(--muted);
-margin-top:10px;
-display:block;
-}
-
-textarea,input,select{
-width:100%;
-margin-top:4px;
-padding:8px;
-border-radius:10px;
-border:none;
-font-family:inherit;
-}
-
-.actions{
-display:flex;
-gap:8px;
-margin-top:14px;
-}
-
-button{
-padding:8px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-weight:600;
-}
-
+.quadrant::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--q);border-radius:18px 0 0 18px;}
+.quadrant.drag-over{outline:2px dashed var(--q);background:rgba(255,255,255,.06);}
+h2{margin:0 0 10px;font-size:15px;color:var(--q);}
+.note{background:color-mix(in srgb, var(--q) 30%, white);color:#222;padding:10px 12px;border-radius:14px;margin-bottom:10px;cursor:grab;box-shadow:0 8px 18px rgba(0,0,0,.25);}
+.note-time{font-size:12px;opacity:.7;margin-top:4px;}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.tag{background:#00000055;color:#fff;font-size:11px;padding:2px 6px;border-radius:6px;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:10;}
+.modal-content{background:var(--panel);padding:18px;width:340px;border-radius:18px;border:1px solid var(--border);}
+label{font-size:12px;color:var(--muted);margin-top:10px;display:block;}
+textarea,input,select{width:100%;margin-top:4px;padding:8px;border-radius:10px;border:none;font-family:inherit;}
+.actions{display:flex;gap:8px;margin-top:14px;}
+button{padding:8px;border:none;border-radius:10px;cursor:pointer;font-weight:600;}
 .save{background:var(--accent);color:#fff}
 .delete{background:#ff6b6b;color:#fff}
-
-/* POMODORO */
-.pomodoro{
-border-top:1px solid var(--border);
-padding:12px;
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-background:rgba(0,0,0,.25);
-}
-
-.pomo-controls{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-}
-
-.timer{
-grid-column:1/3;
-text-align:center;
-font-size:24px;
-font-weight:600;
-margin-top:6px;
-}
-
+.pomodoro{border-top:1px solid var(--border);padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(0,0,0,.25);}
+.pomo-controls{display:flex;gap:6px;flex-wrap:wrap;}
+.timer{grid-column:1/3;text-align:center;font-size:24px;font-weight:600;margin-top:6px;}
 .pomo-btn{background:var(--accent);color:#fff}
 .gray{background:#444;color:#fff}
-
-/* MOBILE */
-@media(max-width:768px){
-.board{grid-template-columns:1fr}
-}
+@media(max-width:768px){.board{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -208,21 +57,16 @@ margin-top:6px;
 <div class="quadrant q4"><h2>Не важно · Не срочно</h2></div>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-content">
 <label>Название задачи</label>
 <textarea id="taskText"></textarea>
-
 <label>Срок выполнения</label>
 <input type="datetime-local" id="taskDeadline">
-
 <label>Теги</label>
 <input id="taskTags">
-
 <label>Комментарий</label>
 <textarea id="taskComment"></textarea>
-
 <div class="actions">
 <button class="save" onclick="saveTask()">Сохранить</button>
 <button class="delete" onclick="deleteTask()">Удалить</button>
@@ -230,7 +74,6 @@ margin-top:6px;
 </div>
 </div>
 
-<!-- POMODORO -->
 <div class="pomodoro">
 <div>
 <label>Работа (мин)</label>
@@ -240,7 +83,6 @@ margin-top:6px;
 <label>Отдых (мин)</label>
 <input type="number" id="restTime" value="5">
 </div>
-
 <div class="pomo-controls">
 <button class="pomo-btn" onclick="startTimer()">▶ Старт</button>
 <button class="gray" onclick="pauseTimer()">⏸ Пауза</button>
@@ -248,14 +90,12 @@ margin-top:6px;
 <button class="gray" onclick="setMode('work')">🍅 Работа</button>
 <button class="gray" onclick="setMode('rest')">💤 Отдых</button>
 </div>
-
 <div class="timer" id="timer">🍅 25:00</div>
 </div>
 
 <script>
 let activeQuadrant=null, editingNote=null, draggedNote=null;
 let timerInterval=null, remaining=0, mode='work';
-
 const beep=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
 
 /* BOARD */
@@ -265,21 +105,12 @@ if(e.target.closest('.note')) return;
 activeQuadrant=q;
 openModal(null);
 };
-
-q.ondragover=e=>{
-e.preventDefault();
-q.classList.add('drag-over');
-};
-
+q.ondragover=e=>{e.preventDefault();q.classList.add('drag-over');};
 q.ondragleave=()=>q.classList.remove('drag-over');
-
-q.ondrop=()=>{
-q.classList.remove('drag-over');
-if(draggedNote){
-q.appendChild(draggedNote);
-}
-};
+q.ondrop=()=>{q.classList.remove('drag-over');if(draggedNote){q.appendChild(draggedNote);updateNoteColor(draggedNote,q);}};
 });
+
+function updateNoteColor(note,q){note.style.backgroundColor=`color-mix(in srgb, ${getComputedStyle(q).getPropertyValue('--q')} 30%, white)`;}
 
 function openModal(note){
 editingNote=note;
@@ -294,83 +125,46 @@ function saveTask(){
 let note=editingNote||document.createElement('div');
 note.className='note';
 note.draggable=true;
-
 note.dataset.text=taskText.value;
 note.dataset.deadline=taskDeadline.value;
 note.dataset.tags=taskTags.value;
 note.dataset.comment=taskComment.value;
-
-note.innerHTML=`
-<div>${taskText.value}</div>
-${taskDeadline.value?`<div class="note-time">📅 ${new Date(taskDeadline.value).toLocaleString()}</div>`:''}
-<div class="tags">${renderTags(taskTags.value)}</div>
-`;
-
-note.onclick=e=>{
-e.stopPropagation();
-openModal(note);
-};
-
+note.innerHTML=`<div>${taskText.value}</div>${taskDeadline.value?`<div class="note-time">📅 ${new Date(taskDeadline.value).toLocaleString()}</div>`:''}<div class="tags">${renderTags(taskTags.value)}</div>`;
+note.onclick=e=>{e.stopPropagation();openModal(note);};
 note.ondragstart=()=>draggedNote=note;
 note.ondragend=()=>draggedNote=null;
-
 if(!editingNote) activeQuadrant.appendChild(note);
+updateNoteColor(note,activeQuadrant);
 closeModal();
 }
 
-function deleteTask(){
-if(editingNote) editingNote.remove();
-closeModal();
-}
-
-function renderTags(str){
-return str.split(/[,#]/).filter(t=>t.trim()).map(t=>`<span class="tag">#${t.trim()}</span>`).join('');
-}
-
-function closeModal(){
-modal.style.display='none';
-editingNote=null;
-}
+function deleteTask(){if(editingNote) editingNote.remove();closeModal();}
+function renderTags(str){return str.split(/[,#]/).filter(t=>t.trim()).map(t=>`<span class="tag">#${t.trim()}</span>`).join('');}
+function closeModal(){modal.style.display='none';editingNote=null;}
 
 /* POMODORO */
-function startTimer(){
-clearInterval(timerInterval);
-remaining=(mode==='work'?workTime.value:restTime.value)*60;
-tick();
-timerInterval=setInterval(runTimer,1000);
-}
+function startTimer(){clearInterval(timerInterval);remaining=(mode==='work'?workTime.value:restTime.value)*60;tick();timerInterval=setInterval(runTimer,1000);}
+function pauseTimer(){clearInterval(timerInterval);}
+function stopTimer(){clearInterval(timerInterval);remaining=0;tick();}
+function setMode(m){mode=m;remaining=(mode==='work'?workTime.value:restTime.value)*60;tick();}
+function runTimer(){remaining--;tick();if(remaining<=0){beep.play();notify(`Pomodoro завершен`);setMode(mode==='work'?'rest':'work');}}
+function tick(){let m=String(Math.floor(remaining/60)).padStart(2,'0');let s=String(remaining%60).padStart(2,'0');timer.textContent=`${mode==='work'?'🍅':'💤'} ${m}:${s}`;}
 
-function pauseTimer(){
-clearInterval(timerInterval);
-}
+/* NOTIFICATIONS */
+if(Notification.permission!=="granted")Notification.requestPermission();
 
-function stopTimer(){
-clearInterval(timerInterval);
-remaining=0;
-tick();
-}
+function notify(msg){if(Notification.permission==="granted"){new Notification("Матрица Эйзенхауэра", {body:msg});}}
 
-function setMode(m){
-mode=m;
-remaining=(mode==='work'?workTime.value:restTime.value)*60;
-tick();
-}
+/* CHECK DEADLINES EVERY MINUTE */
+setInterval(()=>{
+document.querySelectorAll('.note').forEach(n=>{
+if(!n.dataset.deadline) return;
+let d=new Date(n.dataset.deadline).getTime();
+let now=Date.now();
+if(d-now>0 && d-now<=30*60*1000 && !n.dataset.notified){notify(`Задача "${n.dataset.text}" через 30 минут!`);n.dataset.notified=true;}
+});
+},60000);
 
-function runTimer(){
-remaining--;
-tick();
-if(remaining<=0){
-beep.play();
-setMode(mode==='work'?'rest':'work');
-}
-}
-
-function tick(){
-let m=String(Math.floor(remaining/60)).padStart(2,'0');
-let s=String(remaining%60).padStart(2,'0');
-timer.textContent=`${mode==='work'?'🍅':'💤'} ${m}:${s}`;
-}
 </script>
-
 </body>
 </html>
