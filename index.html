@@ -23,7 +23,6 @@ body{
   color:var(--text);
   transition: background var(--transition);
   background-color:#0d0f1f;
-  /* полу-прозрачная сетка */
   background-image:
     linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -181,28 +180,41 @@ textarea,input,select{
 }
 
 button{
-  padding:12px;
+  padding:12px 20px;
   border:none;
   border-radius:14px;
   font-weight:600;
+  font-size:14px;
   cursor:pointer;
-  transition:all .2s;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .save{
-  background:var(--accent);
+  background:linear-gradient(135deg, #5c6bc0, #7986cb);
   color:#fff;
 }
 .save:hover{
-  background:#3f51b5;
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+}
+.save:active{
+  transform:translateY(1px);
+  box-shadow:0 3px 10px rgba(0,0,0,0.2);
 }
 
 .delete{
-  background:#ff6b6b;
+  background:linear-gradient(135deg, #ff6b6b, #ff8787);
   color:#fff;
 }
 .delete:hover{
-  background:#e53935;
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.35);
+}
+.delete:active{
+  transform:translateY(1px);
+  box-shadow:0 3px 10px rgba(0,0,0,0.2);
 }
 
 .pomodoro{
@@ -229,8 +241,23 @@ button{
   color:var(--accent);
 }
 
-.pomo-btn{background:var(--accent);color:#fff;}
-.gray{background:#777;color:#fff;}
+.pomo-btn{
+  background: linear-gradient(135deg, #5c6bc0, #7986cb);
+  color:#fff;
+}
+.gray{
+  background: linear-gradient(135deg, #555, #777);
+  color:#fff;
+}
+
+.pomo-btn:hover,.gray:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+}
+.pomo-btn:active,.gray:active{
+  transform: translateY(1px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
 
 @media(max-width:768px){
   .board{grid-template-columns:1fr;}
@@ -254,7 +281,7 @@ button{
     <textarea id="taskText"></textarea>
     <label>Срок выполнения</label>
     <input type="datetime-local" id="taskDeadline">
-    <label>Теги</label>
+    <label>Теги (через запятую)</label>
     <input id="taskTags">
     <label>Комментарий</label>
     <textarea id="taskComment"></textarea>
@@ -300,7 +327,14 @@ function updateNoteColor(note,q){
   note.style.backgroundColor=`color-mix(in srgb, ${getComputedStyle(q).getPropertyValue('--q')} 25%, rgba(255,255,255,0.05))`;
 }
 
-function openModal(note){editingNote=note;modal.style.display='flex';taskText.value=note?.dataset.text||'';taskDeadline.value=note?.dataset.deadline||'';taskTags.value=note?.dataset.tags||'';taskComment.value=note?.dataset.comment||'';}
+function openModal(note){
+  editingNote=note;
+  modal.style.display='flex';
+  taskText.value=note?.dataset.text||'';
+  taskDeadline.value=note?.dataset.deadline||'';
+  taskTags.value=note?.dataset.tags||'';
+  taskComment.value=note?.dataset.comment||'';
+}
 function saveTask(){
   let note=editingNote||document.createElement('div');
   note.className='note';note.draggable=true;
