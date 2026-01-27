@@ -8,10 +8,12 @@
 
 <style>
 :root{
---bg:#0f1220;
---glass:rgba(255,255,255,.08);
---border:rgba(255,255,255,.15);
---text:#fff;
+--bg:#0e1024;
+--panel:#15183a;
+--card:#fff9c4;
+--border:rgba(255,255,255,.12);
+--text:#ffffff;
+--muted:#b9c0ff;
 --accent:#6c63ff;
 }
 
@@ -20,18 +22,20 @@
 body{
 margin:0;
 font-family:Inter,sans-serif;
-background:linear-gradient(135deg,#1a1f3c,#0f1220);
+background:radial-gradient(circle at top,#1b1f55,#0e1024);
 color:var(--text);
 display:flex;
 flex-direction:column;
 height:100vh;
 }
 
+/* HEADER */
 header{
+padding:16px;
 text-align:center;
-padding:14px;
 font-size:22px;
 font-weight:600;
+letter-spacing:.3px;
 }
 
 /* BOARD */
@@ -40,41 +44,63 @@ flex:1;
 display:grid;
 grid-template-columns:1fr 1fr;
 grid-template-rows:1fr 1fr;
-gap:12px;
-padding:12px;
+gap:14px;
+padding:14px;
 }
 
 .quadrant{
-background:var(--glass);
+background:linear-gradient(180deg,rgba(255,255,255,.05),transparent);
 border:1px solid var(--border);
-border-radius:16px;
-padding:12px;
+border-radius:18px;
+padding:14px;
 overflow-y:auto;
+position:relative;
+transition:.2s;
 }
 
-.q1 h2{color:#ff6b6b}
-.q2 h2{color:#4dabff}
-.q3 h2{color:#ffd166}
-.q4 h2{color:#6ee7b7}
+.quadrant.drag-over{
+outline:2px dashed var(--accent);
+background:rgba(108,99,255,.15);
+}
+
+.q1{--q:#ff6b6b}
+.q2{--q:#4dabff}
+.q3{--q:#ffd166}
+.q4{--q:#6ee7b7}
+
+.quadrant::before{
+content:'';
+position:absolute;
+left:0;top:0;bottom:0;
+width:5px;
+background:var(--q);
+border-radius:18px 0 0 18px;
+}
 
 h2{
-margin:0 0 8px;
+margin:0 0 10px;
 font-size:15px;
-font-weight:600;
+color:var(--q);
 }
 
 /* NOTE */
 .note{
-background:#fff9c4;
+background:var(--card);
 color:#222;
-padding:10px;
-border-radius:12px;
-margin-bottom:8px;
-cursor:pointer;
+padding:10px 12px;
+border-radius:14px;
+margin-bottom:10px;
+cursor:grab;
+box-shadow:0 8px 18px rgba(0,0,0,.25);
+transition:.15s;
+}
+
+.note:hover{
+transform:translateY(-2px);
 }
 
 .note.active{
-outline:2px solid #ff6b6b;
+outline:2px solid var(--accent);
 }
 
 .note-time{
@@ -87,11 +113,11 @@ margin-top:4px;
 display:flex;
 flex-wrap:wrap;
 gap:4px;
-margin-top:4px;
+margin-top:6px;
 }
 
 .tag{
-background:#222;
+background:#1b1f55;
 color:#fff;
 font-size:11px;
 padding:2px 6px;
@@ -102,48 +128,50 @@ border-radius:6px;
 .modal{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,.6);
+background:rgba(0,0,0,.65);
 display:none;
 align-items:center;
 justify-content:center;
+z-index:10;
 }
 
 .modal-content{
-background:#1a1f3c;
-padding:16px;
+background:var(--panel);
+padding:18px;
 width:340px;
-border-radius:14px;
+border-radius:18px;
 border:1px solid var(--border);
 }
 
 label{
 font-size:12px;
-opacity:.8;
+color:var(--muted);
+margin-top:10px;
 display:block;
-margin-top:8px;
 }
 
-textarea,input{
+textarea,input,select{
 width:100%;
+margin-top:4px;
 padding:8px;
-border-radius:8px;
+border-radius:10px;
 border:none;
 font-family:inherit;
-margin-top:4px;
 }
 
 .actions{
 display:flex;
 gap:8px;
-margin-top:12px;
+margin-top:14px;
 }
 
 button{
 flex:1;
-padding:8px;
+padding:10px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 cursor:pointer;
+font-weight:600;
 }
 
 .save{background:var(--accent);color:#fff}
@@ -152,11 +180,11 @@ cursor:pointer;
 /* POMODORO */
 .pomodoro{
 border-top:1px solid var(--border);
-padding:10px;
+padding:12px;
 display:grid;
 grid-template-columns:1fr 1fr 1fr auto;
-gap:8px;
-align-items:end;
+gap:10px;
+background:rgba(0,0,0,.25);
 }
 
 .timer{
@@ -200,11 +228,11 @@ color:#fff;
 <label>Срок выполнения</label>
 <input type="datetime-local" id="taskDeadline">
 
-<label>Теги (через # или запятую)</label>
+<label>Теги</label>
 <input id="taskTags">
 
-<label>Комментарий к задаче</label>
-<textarea id="taskComment" placeholder="Подробности, мысли, ссылки…"></textarea>
+<label>Комментарий</label>
+<textarea id="taskComment"></textarea>
 
 <div class="actions">
 <button class="save" onclick="saveTask()">Сохранить</button>
@@ -232,16 +260,28 @@ color:#fff;
 </div>
 
 <script>
-let activeQuadrant=null, editingNote=null, activeTask=null;
+let activeQuadrant=null, editingNote=null, draggedNote=null;
 let timerInterval, remaining=0, mode='work';
-
 const beep=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
 
+/* QUADRANTS */
 document.querySelectorAll('.quadrant').forEach(q=>{
 q.onclick=e=>{
 if(e.target.closest('.note')) return;
 activeQuadrant=q;
 openModal(null);
+};
+
+q.ondragover=e=>{
+e.preventDefault();
+q.classList.add('drag-over');
+};
+
+q.ondragleave=()=>q.classList.remove('drag-over');
+
+q.ondrop=()=>{
+q.classList.remove('drag-over');
+if(draggedNote) q.appendChild(draggedNote);
 };
 });
 
@@ -257,6 +297,7 @@ taskComment.value=note?.dataset.comment||'';
 function saveTask(){
 let note=editingNote||document.createElement('div');
 note.className='note';
+note.draggable=true;
 
 note.dataset.text=taskText.value;
 note.dataset.deadline=taskDeadline.value;
@@ -271,9 +312,11 @@ ${taskDeadline.value?`<div class="note-time">📅 ${new Date(taskDeadline.value)
 
 note.onclick=e=>{
 e.stopPropagation();
-selectTask(note);
 openModal(note);
 };
+
+note.ondragstart=()=>draggedNote=note;
+note.ondragend=()=>draggedNote=null;
 
 if(!editingNote) activeQuadrant.appendChild(note);
 updatePomodoroTasks();
@@ -297,17 +340,12 @@ editingNote=null;
 
 function updatePomodoroTasks(){
 pomoTask.innerHTML='<option value="">— выбери задачу —</option>';
-document.querySelectorAll('.note').forEach((n,i)=>{
-pomoTask.innerHTML+=`<option value="${i}">${n.dataset.text}</option>`;
+document.querySelectorAll('.note').forEach(n=>{
+pomoTask.innerHTML+=`<option>${n.dataset.text}</option>`;
 });
 }
 
-function selectTask(note){
-document.querySelectorAll('.note').forEach(n=>n.classList.remove('active'));
-note.classList.add('active');
-activeTask=note;
-}
-
+/* POMODORO */
 function startPomodoro(){
 clearInterval(timerInterval);
 mode='work';
