@@ -2,148 +2,255 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Матрица Эйзенхауэра</title>
+<title>Eisenhower + Pomodoro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f2f2f2;
-    }
+:root{
+--bg:#0f1220;
+--glass:rgba(255,255,255,.08);
+--border:rgba(255,255,255,.15);
+--text:#fff;
+--accent:#6c63ff;
+--active:#ff6b6b;
+}
 
-    h1 {
-        text-align: center;
-        padding: 10px;
-        margin: 0;
-        background: #222;
-        color: white;
-    }
+*{box-sizing:border-box}
 
-    .board {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: 1fr 1fr;
-        height: calc(100vh - 60px);
-    }
+body{
+margin:0;
+font-family:Inter,sans-serif;
+background:linear-gradient(135deg,#1a1f3c,#0f1220);
+color:var(--text);
+display:flex;
+flex-direction:column;
+height:100vh;
+}
 
-    .quadrant {
-        border: 2px solid #333;
-        padding: 10px;
-        position: relative;
-        overflow-y: auto;
-        cursor: pointer;
-    }
+header{
+text-align:center;
+padding:14px;
+font-size:22px;
+font-weight:600;
+}
 
-    .quadrant h2 {
-        margin: 0 0 10px 0;
-        font-size: 18px;
-        text-align: center;
-    }
+.board{
+flex:1;
+display:grid;
+grid-template-columns:1fr 1fr;
+grid-template-rows:1fr 1fr;
+gap:12px;
+padding:12px;
+}
 
-    .important-urgent { background: #ffe5e5; }
-    .important-not-urgent { background: #e5f0ff; }
-    .not-important-urgent { background: #fff5cc; }
-    .not-important-not-urgent { background: #e6ffe6; }
+.quadrant{
+background:var(--glass);
+border:1px solid var(--border);
+border-radius:16px;
+padding:12px;
+overflow-y:auto;
+}
 
-    .note {
-        background: #fff8a8;
-        padding: 8px;
-        margin-bottom: 8px;
-        border-radius: 6px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        font-size: 14px;
-        cursor: default;
-    }
+h2{margin:0 0 8px;font-size:15px}
 
-    /* Модальное окно */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        justify-content: center;
-        align-items: center;
-    }
+.note{
+background:#fff9c4;
+color:#222;
+padding:10px;
+border-radius:12px;
+margin-bottom:8px;
+cursor:pointer;
+}
 
-    .modal-content {
-        background: white;
-        padding: 20px;
-        width: 300px;
-        border-radius: 10px;
-    }
+.note.active{
+outline:2px solid var(--active);
+}
 
-    .modal textarea {
-        width: 100%;
-        height: 80px;
-        resize: none;
-    }
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.tag{font-size:11px;background:#222;color:#fff;padding:2px 6px;border-radius:6px}
 
-    .modal button {
-        margin-top: 10px;
-        width: 100%;
-        padding: 8px;
-        font-size: 16px;
-        cursor: pointer;
-    }
+/* Modal */
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+display:none;
+align-items:center;
+justify-content:center;
+}
+
+.modal-content{
+background:#1a1f3c;
+padding:16px;
+width:320px;
+border-radius:14px;
+border:1px solid var(--border);
+}
+
+textarea,input,select{
+width:100%;
+margin-top:6px;
+padding:8px;
+border-radius:8px;
+border:none;
+font-family:inherit;
+}
+
+.actions{display:flex;gap:8px;margin-top:10px}
+button{flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer}
+.save{background:var(--accent);color:#fff}
+.delete{background:#ff6b6b;color:#fff}
+
+/* Pomodoro */
+.pomodoro{
+border-top:1px solid var(--border);
+padding:10px;
+display:grid;
+grid-template-columns:1fr 1fr 1fr auto;
+gap:8px;
+align-items:center;
+}
+
+.timer{
+grid-column:1/5;
+text-align:center;
+font-size:22px;
+font-weight:600;
+}
+
+.pomo-btn{background:var(--accent);color:#fff}
+
+/* Mobile */
+@media(max-width:768px){
+.board{grid-template-columns:1fr;grid-template-rows:auto}
+.pomodoro{
+grid-template-columns:1fr;
+}
+.timer{grid-column:auto}
+}
 </style>
 </head>
 <body>
 
-<h1>Матрица Эйзенхауэра</h1>
+<header>Матрица Эйзенхауэра</header>
 
 <div class="board">
-    <div class="quadrant important-urgent" data-id="q1">
-        <h2>Важно / Срочно</h2>
-    </div>
-    <div class="quadrant important-not-urgent" data-id="q2">
-        <h2>Важно / Не срочно</h2>
-    </div>
-    <div class="quadrant not-important-urgent" data-id="q3">
-        <h2>Не важно / Срочно</h2>
-    </div>
-    <div class="quadrant not-important-not-urgent" data-id="q4">
-        <h2>Не важно / Не срочно</h2>
-    </div>
+<div class="quadrant"><h2>Важно · Срочно</h2></div>
+<div class="quadrant"><h2>Важно · Не срочно</h2></div>
+<div class="quadrant"><h2>Не важно · Срочно</h2></div>
+<div class="quadrant"><h2>Не важно · Не срочно</h2></div>
 </div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
-    <div class="modal-content">
-        <h3>Новая задача</h3>
-        <textarea id="taskText" placeholder="Введите задачу..."></textarea>
-        <button onclick="addTask()">Добавить</button>
-    </div>
+<div class="modal-content">
+<textarea id="taskText" placeholder="Задача"></textarea>
+<input id="taskTags" placeholder="Теги">
+<div class="actions">
+<button class="save" onclick="saveTask()">Сохранить</button>
+<button class="delete" onclick="deleteTask()">Удалить</button>
+</div>
+</div>
+</div>
+
+<!-- POMODORO -->
+<div class="pomodoro">
+<select id="pomoSelect"></select>
+<input type="number" id="workTime" value="25">
+<input type="number" id="restTime" value="5">
+<button class="pomo-btn" onclick="startPomodoro()">▶</button>
+<div class="timer" id="timer">🍅 25:00</div>
 </div>
 
 <script>
-    let currentQuadrant = null;
+let activeQuadrant=null, editingNote=null, activeTask=null;
+let timerInterval, remaining=0, mode='work';
 
-    document.querySelectorAll('.quadrant').forEach(q => {
-        q.addEventListener('click', function(e) {
-            if (e.target.classList.contains('note')) return;
-            currentQuadrant = this;
-            document.getElementById('modal').style.display = 'flex';
-            document.getElementById('taskText').value = '';
-        });
-    });
+const beep=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
 
-    function addTask() {
-        const text = document.getElementById('taskText').value.trim();
-        if (!text) return;
+document.querySelectorAll('.quadrant').forEach(q=>{
+q.onclick=e=>{
+if(e.target.closest('.note')) return;
+activeQuadrant=q;
+openModal(null);
+};
+});
 
-        const note = document.createElement('div');
-        note.className = 'note';
-        note.textContent = text;
+function openModal(note){
+editingNote=note;
+modal.style.display='flex';
+taskText.value=note?.dataset.text||'';
+taskTags.value=note?.dataset.tags||'';
+}
 
-        currentQuadrant.appendChild(note);
-        closeModal();
-    }
+function saveTask(){
+let note=editingNote||document.createElement('div');
+note.className='note';
+note.dataset.text=taskText.value;
+note.dataset.tags=taskTags.value;
+note.innerHTML=`
+<div>${taskText.value}</div>
+<div class="tags">${renderTags(taskTags.value)}</div>
+`;
 
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-    }
+note.onclick=e=>{
+e.stopPropagation();
+selectTask(note);
+openModal(note);
+};
 
-    document.getElementById('modal').addEventListener('click', e => {
-        if (e.target.id === 'modal') closeModal();
-    });
+if(!editingNote) activeQuadrant.appendChild(note);
+updatePomodoroList();
+closeModal();
+}
+
+function deleteTask(){
+if(editingNote) editingNote.remove();
+updatePomodoroList();
+closeModal();
+}
+
+function renderTags(str){
+return str.split(/[,#]/).filter(t=>t).map(t=>`<span class="tag">#${t.trim()}</span>`).join('');
+}
+
+function closeModal(){modal.style.display='none';editingNote=null}
+
+function updatePomodoroList(){
+pomoSelect.innerHTML='<option value="">Выбери задачу</option>';
+document.querySelectorAll('.note').forEach((n,i)=>{
+pomoSelect.innerHTML+=`<option value="${i}">${n.dataset.text}</option>`;
+});
+}
+
+function selectTask(note){
+document.querySelectorAll('.note').forEach(n=>n.classList.remove('active'));
+note.classList.add('active');
+activeTask=note;
+pomoSelect.value=[...document.querySelectorAll('.note')].indexOf(note);
+}
+
+function startPomodoro(){
+clearInterval(timerInterval);
+mode='work';
+remaining=workTime.value*60;
+tick();
+timerInterval=setInterval(()=>{
+remaining--;
+tick();
+if(remaining<=0){
+beep.play();
+mode=mode==='work'?'rest':'work';
+remaining=(mode==='work'?workTime.value:restTime.value)*60;
+}
+},1000);
+}
+
+function tick(){
+let m=String(Math.floor(remaining/60)).padStart(2,'0');
+let s=String(remaining%60).padStart(2,'0');
+timer.textContent=`${mode==='work'?'🍅':'💤'} ${m}:${s}`;
+}
 </script>
 
 </body>
