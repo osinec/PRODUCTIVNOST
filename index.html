@@ -355,7 +355,7 @@ button{
 /* Drag & drop, создание и редактирование задач */
 let activeQuadrant=null, editingNote=null, draggedNote=null;
 let timerInterval=null, remaining=0, mode='work';
-const beep=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=");
+const beep=new Audio("beep.mp3");
 
 document.querySelectorAll('.quadrant').forEach(q=>{
   q.onclick=e=>{if(e.target.closest('.note')) return;activeQuadrant=q;openModal(null);};
