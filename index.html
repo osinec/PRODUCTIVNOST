@@ -5,8 +5,6 @@
 <title>Матрица Эйзенхауэра — Premium PWA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#5c6bc0">
 
 <style>
 :root{
@@ -16,34 +14,29 @@
   --muted:#a0a0b0;
   --accent:#5c6bc0;
   --note-bg:rgba(255,255,255,0.05);
-  --transition:.3s;
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif;}
+
 body{
-  display:flex;
-  flex-direction:column;
   min-height:100vh;
   color:var(--text);
-  transition: background var(--transition);
-  background-color:#0d0f1f;
+  background:#0d0f1f;
   background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size:40px 40px;
 }
 
 header{
-  padding:20px;
   text-align:center;
-  font-weight:700;
+  padding:18px;
   font-size:26px;
-  letter-spacing:0.5px;
+  font-weight:700;
   color:var(--accent);
-  text-shadow:0 1px 5px rgba(0,0,0,0.4);
 }
 
+/* ===== BOARD ===== */
 .board{
-  flex:1;
   display:grid;
   grid-template-columns:1fr 1fr;
   grid-template-rows:1fr 1fr;
@@ -55,18 +48,11 @@ header{
   position:relative;
   background:var(--panel);
   border-radius:24px;
-  padding:18px;
-  overflow:auto;
-  box-shadow:0 8px 28px rgba(0,0,0,0.4);
-  transition:box-shadow var(--transition), transform var(--transition);
+  padding:16px;
+  min-height:160px;
+  box-shadow:0 8px 28px rgba(0,0,0,.45);
   display:flex;
   flex-direction:column;
-  min-height:150px;
-}
-
-.quadrant:hover{
-  box-shadow:0 12px 36px rgba(0,0,0,0.5);
-  transform:translateY(-2px);
 }
 
 .q1{--q:#ff6e6e;}
@@ -77,390 +63,115 @@ header{
 .quadrant::before{
   content:'';
   position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
+  left:0;top:0;bottom:0;
   width:6px;
   background:var(--q);
   border-radius:24px 0 0 24px;
-  box-shadow:0 0 8px var(--q);
 }
 
-.quadrant.drag-over{
-  outline:2px dashed var(--accent);
-  background:rgba(92,107,192,0.1);
-}
-
-/* Уменьшенные заголовки */
 h2{
-  font-weight:600;
-  font-size:14px; /* уменьшили с 16px до 14px */
-  line-height:1.2; /* меньше высоты строки */
-  margin-bottom:10px; /* уменьшили отступ */
+  font-size:14px;
+  line-height:1.15;
+  margin-bottom:10px;
   color:var(--q);
-  text-shadow:0 1px 3px rgba(0,0,0,0.3);
+  font-weight:600;
 }
 
+/* ===== NOTES ===== */
 .note{
   background:var(--note-bg);
-  padding:14px 16px;
-  border-radius:16px;
-  margin-bottom:14px;
+  border-radius:14px;
+  padding:12px 14px;
+  margin-bottom:12px;
   cursor:grab;
-  box-shadow:0 6px 20px rgba(0,0,0,0.4);
-  transition:transform .3s, box-shadow .3s, background .3s;
-  opacity:0;
-  animation:fadeIn .4s forwards;
 }
 
-.note:hover{
-  transform:translateY(-3px);
-  box-shadow:0 10px 28px rgba(0,0,0,0.5);
-}
-
-@keyframes fadeIn{
-  to{opacity:1;}
-}
-
-.note-time{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:6px;
-}
-
-.tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px;
-  margin-top:8px;
-}
-
-.tag{
-  background:var(--accent);
-  color:#fff;
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:6px;
-  opacity:.85;
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-  transition:opacity .3s;
-}
-
-.modal-content{
-  background:var(--panel);
-  padding:24px;
-  width:380px;
-  border-radius:24px;
-  box-shadow:0 12px 32px rgba(0,0,0,0.6);
-}
-
-label{
-  font-size:13px;
-  color:var(--muted);
-  margin-top:14px;
-  display:block;
-}
-
-textarea,input,select{
-  width:100%;
-  margin-top:6px;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  font-family:inherit;
-  background:rgba(255,255,255,0.03);
-  color:var(--text);
-}
-
-.actions{
-  display:flex;
-  gap:12px;
-  margin-top:18px;
-}
-
-button{
-  padding:12px 20px;
-  border:none;
-  border-radius:14px;
-  font-weight:600;
-  font-size:14px;
-  cursor:pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.save{
-  background:linear-gradient(135deg, #5c6bc0, #7986cb);
-  color:#fff;
-}
-.save:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 20px rgba(0,0,0,0.35);
-}
-.save:active{
-  transform:translateY(1px);
-  box-shadow:0 3px 10px rgba(0,0,0,0.2);
-}
-
-.delete{
-  background:linear-gradient(135deg, #ff6b6b, #ff8787);
-  color:#fff;
-}
-.delete:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 20px rgba(0,0,0,0.35);
-}
-.delete:active{
-  transform:translateY(1px);
-  box-shadow:0 3px 10px rgba(0,0,0,0.2);
-}
-
-/* Pomodoro */
+/* ===== POMODORO ===== */
 .pomodoro{
-  border-top:1px solid var(--border);
+  margin-top:10px;
   padding:16px;
+  background:var(--panel);
+  border-top:1px solid var(--border);
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
-  background:var(--panel);
-}
-
-.pomo-controls{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-  justify-content:flex-start;
 }
 
 .timer{
   grid-column:1/3;
   text-align:center;
-  font-size:36px; 
+  font-size:36px;
   font-weight:700;
-  color:#ffffff;   
-  margin-bottom:12px; 
-  text-shadow:0 2px 6px rgba(0,0,0,0.7);
 }
 
-.pomo-btn{
-  background: linear-gradient(135deg, #5c6bc0, #7986cb);
+button{
+  border:none;
+  border-radius:14px;
+  padding:12px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#5c6bc0,#7986cb);
   color:#fff;
 }
-.gray{
-  background: linear-gradient(135deg, #555, #777);
-  color:#fff;
-}
 
-.pomo-btn:hover,.gray:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-}
-.pomo-btn:active,.gray:active{
-  transform: translateY(1px);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-
-/* Мобильная адаптация */
+/* ================== */
+/* 📱 MOBILE MAGIC 📱 */
+/* ================== */
 @media(max-width:768px){
+
   .board{
     grid-template-columns:1fr;
+    padding:12px;
     gap:12px;
-    padding:12px;
   }
+
+  /* Базовая высота */
   .quadrant{
-    padding:14px;
+    min-height:120px;
+  }
+
+  /* 🔻 ПЕРВЫЕ ДВА МЕНЬШЕ */
+  .quadrant.compact{
     min-height:80px;
-    flex:0 1 auto;
+    padding-top:10px;
+    padding-bottom:10px;
   }
-  .pomodoro{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    padding:12px;
+
+  .quadrant.compact h2{
+    margin-bottom:6px;
   }
-  .pomo-controls{
-    flex-direction:row;
-    flex-wrap:wrap;
-    gap:8px;
-  }
-  .pomo-controls button{
-    font-size:14px;
-    padding:10px 14px;
-  }
+
   .timer{
     font-size:42px;
-  }
-  textarea,input,select{
-    font-size:14px;
-    padding:10px;
-  }
-  h2{
-    font-size:16px;
-    line-height:1.2;
   }
 }
 </style>
 </head>
+
 <body>
 
 <header>Матрица Эйзенхауэра</header>
 
 <div class="board">
-  <div class="quadrant q1"><h2>Важно · Срочно</h2></div>
-  <div class="quadrant q2"><h2>Важно · Не срочно</h2></div>
+  <div class="quadrant q1 compact"><h2>Важно · Срочно</h2></div>
+  <div class="quadrant q2 compact"><h2>Важно · Не срочно</h2></div>
   <div class="quadrant q3"><h2>Не важно · Срочно</h2></div>
   <div class="quadrant q4"><h2>Не важно · Не срочно</h2></div>
-</div>
-
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <label>Название задачи</label>
-    <textarea id="taskText"></textarea>
-    <label>Срок выполнения</label>
-    <input type="datetime-local" id="taskDeadline">
-    <label>Теги (через запятую)</label>
-    <input id="taskTags">
-    <label>Комментарий</label>
-    <textarea id="taskComment"></textarea>
-    <div class="actions">
-      <button class="save" onclick="saveTask()">Сохранить</button>
-      <button class="delete" onclick="deleteTask()">Удалить</button>
-    </div>
-  </div>
 </div>
 
 <div class="pomodoro">
   <div>
     <label>Работа (мин)</label>
-    <input type="number" id="workTime" value="25">
+    <input type="number" value="25">
   </div>
   <div>
     <label>Отдых (мин)</label>
-    <input type="number" id="restTime" value="5">
+    <input type="number" value="5">
   </div>
-  <div class="pomo-controls">
-    <button class="pomo-btn" onclick="startTimer()">Старт</button>
-    <button class="gray" onclick="pauseTimer()">Пауза</button>
-    <button class="gray" onclick="stopTimer()">Стоп</button>
-    <button class="gray" onclick="setMode('work')">Работа</button>
-    <button class="gray" onclick="setMode('rest')">Отдых</button>
-  </div>
-  <div class="timer" id="timer">25:00</div>
+  <div class="timer">25:00</div>
+  <button>Старт</button>
+  <button>Пауза</button>
 </div>
 
-<script>
-let activeQuadrant = null, editingNote = null, draggedNote = null;
-let timerInterval = null, mode = 'work', endTime = 0;
-const beep = new Audio("https://www.soundjay.com/button/beep-07.wav");
-
-// Drag & Drop и заметки
-document.querySelectorAll('.quadrant').forEach(q=>{
-  q.onclick = e => { if(e.target.closest('.note')) return; activeQuadrant = q; openModal(null); };
-  q.ondragover = e => { e.preventDefault(); q.classList.add('drag-over'); };
-  q.ondragleave = () => q.classList.remove('drag-over');
-  q.ondrop = () => { 
-    q.classList.remove('drag-over'); 
-    if(draggedNote){ q.appendChild(draggedNote); updateNoteColor(draggedNote,q); } 
-  };
-});
-
-function updateNoteColor(note,q){
-  note.style.backgroundColor = `color-mix(in srgb, ${getComputedStyle(q).getPropertyValue('--q')} 25%, rgba(255,255,255,0.05))`;
-}
-
-function openModal(note){
-  editingNote = note;
-  modal.style.display = 'flex';
-  taskText.value = note?.dataset.text || '';
-  taskDeadline.value = note?.dataset.deadline || '';
-  taskTags.value = note?.dataset.tags || '';
-  taskComment.value = note?.dataset.comment || '';
-}
-
-function saveTask(){
-  let note = editingNote || document.createElement('div');
-  note.className='note'; note.draggable=true;
-  note.dataset.text = taskText.value;
-  note.dataset.deadline = taskDeadline.value;
-  note.dataset.tags = taskTags.value;
-  note.dataset.comment = taskComment.value;
-  note.innerHTML = `
-    <div>${taskText.value}</div>
-    ${taskDeadline.value?`<div class="note-time">${new Date(taskDeadline.value).toLocaleString()}</div>`:''}
-    <div class="tags">${renderTags(taskTags.value)}</div>
-  `;
-  note.onclick = e => { e.stopPropagation(); openModal(note); };
-  note.ondragstart = () => draggedNote = note;
-  note.ondragend = () => draggedNote = null;
-  if(!editingNote) activeQuadrant.appendChild(note);
-  updateNoteColor(note, activeQuadrant);
-  closeModal();
-}
-
-function deleteTask(){ if(editingNote) editingNote.remove(); closeModal(); }
-function renderTags(str){ return str.split(/[,#]/).filter(t=>t.trim()).map(t=>`<span class="tag">#${t.trim()}</span>`).join(''); }
-function closeModal(){ modal.style.display='none'; editingNote=null; }
-
-/* Pomodoro с корректным временем */
-function startTimer(){
-  clearInterval(timerInterval);
-  let duration = (mode==='work'?parseInt(workTime.value):parseInt(restTime.value))*60;
-  endTime = Date.now() + duration*1000;
-  tick();
-  timerInterval = setInterval(tick, 200);
-}
-
-function pauseTimer(){
-  clearInterval(timerInterval);
-  let remaining = Math.max(0, Math.round((endTime - Date.now())/1000));
-  if(remaining>0) endTime = Date.now() + remaining*1000;
-}
-
-function stopTimer(){
-  clearInterval(timerInterval);
-  endTime = 0;
-  let total = mode==='work'?parseInt(workTime.value)*60:parseInt(restTime.value)*60;
-  timer.textContent = String(Math.floor(total/60)).padStart(2,'0') + ':' + String(total%60).padStart(2,'0');
-}
-
-function setMode(m){
-  mode = m;
-  stopTimer();
-}
-
-function tick(){
-  if(endTime<=0){
-    let total = mode==='work'?parseInt(workTime.value)*60:parseInt(restTime.value)*60;
-    timer.textContent = String(Math.floor(total/60)).padStart(2,'0') + ':' + String(total%60).padStart(2,'0');
-    return;
-  }
-  let remaining = Math.max(0, Math.round((endTime - Date.now())/1000));
-  let m = String(Math.floor(remaining/60)).padStart(2,'0');
-  let s = String(remaining%60).padStart(2,'0');
-  timer.textContent = `${m}:${s}`;
-  if(remaining <= 0){
-    clearInterval(timerInterval);
-    beep.play();
-    notify(`Pomodoro завершен (${mode==='work'?'Работа':'Отдых'})`);
-  }
-}
-
-/* Notifications */
-if(Notification.permission!=="granted") Notification.requestPermission();
-function notify(msg){
-  if(Notification.permission==="granted") new Notification("Матрица Эйзенхауэра",{body:msg});
-}
-</script>
 </body>
 </html>
