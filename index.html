@@ -13,6 +13,7 @@
   --panel:#1b1f2e;
   --text:#f5f6fa;
   --muted:#9aa0b5;
+  --accent:#6f7dff;
 }
 
 *{
@@ -35,10 +36,10 @@ body{
 /* ===== HEADER ===== */
 header{
   text-align:center;
-  padding:18px 16px 10px;
+  padding:18px 16px 12px;
   font-size:26px;
   font-weight:700;
-  color:#6f7dff;
+  color:var(--accent);
 }
 
 /* ===== BOARD ===== */
@@ -46,36 +47,32 @@ header{
   padding:14px;
   display:grid;
   grid-template-columns:1fr;
-  grid-template-rows:
-    78px
-    78px
-    110px
-    110px;
+  grid-template-rows:repeat(4, 90px); /* 🔒 ЖЁСТКО РОВНЫЕ */
   gap:12px;
 }
 
 /* ===== QUADRANT ===== */
 .quadrant{
+  position:relative;
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
-  padding:14px 16px;
+  padding:16px 18px 16px 22px;
   display:flex;
   align-items:flex-start;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.04),
     0 10px 24px rgba(0,0,0,.45);
-  position:relative;
 }
 
-/* цветная полоса */
+/* цветная полоса — ВСЕГДА 100% */
 .quadrant::before{
   content:'';
   position:absolute;
   left:0;
-  top:12px;
-  bottom:12px;
-  width:4px;
-  border-radius:4px;
+  top:0;
+  bottom:0;
+  width:5px;
+  border-radius:22px 0 0 22px;
 }
 
 .q1::before{background:#ff6b6b;}
@@ -86,13 +83,13 @@ header{
 h2{
   font-size:14px;
   font-weight:600;
-  letter-spacing:.2px;
+  line-height:1.2;
 }
 
 /* ===== POMODORO ===== */
 .pomodoro{
-  margin:12px;
-  padding:16px;
+  margin:14px;
+  padding:18px;
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
   box-shadow:0 12px 28px rgba(0,0,0,.5);
@@ -101,7 +98,7 @@ h2{
 .pomo-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:12px;
 }
 
 label{
@@ -112,8 +109,8 @@ label{
 input{
   width:100%;
   margin-top:4px;
-  padding:8px 10px;
-  border-radius:10px;
+  padding:10px 12px;
+  border-radius:12px;
   border:none;
   background:#0f1324;
   color:#fff;
@@ -121,15 +118,17 @@ input{
 
 .timer{
   text-align:center;
-  font-size:42px;
+  font-size:44px;
   font-weight:700;
-  margin:14px 0 12px;
+  margin:18px 0 14px;
 }
 
-.buttons{
+.buttons,
+.mode-buttons{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
+  margin-top:10px;
 }
 
 button{
@@ -138,8 +137,15 @@ button{
   border:none;
   font-weight:600;
   cursor:pointer;
-  background:linear-gradient(135deg,#6f7dff,#7f8cff);
   color:white;
+}
+
+.primary{
+  background:linear-gradient(135deg,#6f7dff,#7f8cff);
+}
+
+.secondary{
+  background:linear-gradient(135deg,#4a4f6a,#5c6280);
 }
 </style>
 </head>
@@ -169,9 +175,15 @@ button{
 
   <div class="timer">25:00</div>
 
+  <!-- ВОЗВРАЩЕНЫ -->
+  <div class="mode-buttons">
+    <button class="secondary">Работа</button>
+    <button class="secondary">Отдых</button>
+  </div>
+
   <div class="buttons">
-    <button>Старт</button>
-    <button>Пауза</button>
+    <button class="primary">Старт</button>
+    <button class="secondary">Пауза</button>
   </div>
 </div>
 
