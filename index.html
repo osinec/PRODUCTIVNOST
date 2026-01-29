@@ -33,7 +33,7 @@ body{
   color:var(--text);
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header{
   text-align:center;
   padding:18px 16px 12px;
@@ -42,16 +42,15 @@ header{
   color:var(--accent);
 }
 
-/* ===== BOARD ===== */
+/* BOARD */
 .board{
   padding:14px;
   display:grid;
   grid-template-columns:1fr;
-  grid-template-rows:repeat(4, 90px); /* 🔒 ЖЁСТКО РОВНЫЕ */
+  grid-template-rows:repeat(4, 90px);
   gap:12px;
 }
 
-/* ===== QUADRANT ===== */
 .quadrant{
   position:relative;
   background:linear-gradient(180deg,#1e2334,#191d2b);
@@ -64,7 +63,6 @@ header{
     0 10px 24px rgba(0,0,0,.45);
 }
 
-/* цветная полоса — ВСЕГДА 100% */
 .quadrant::before{
   content:'';
   position:absolute;
@@ -83,10 +81,9 @@ header{
 h2{
   font-size:14px;
   font-weight:600;
-  line-height:1.2;
 }
 
-/* ===== POMODORO ===== */
+/* POMODORO */
 .pomodoro{
   margin:14px;
   padding:18px;
@@ -147,6 +144,10 @@ button{
 .secondary{
   background:linear-gradient(135deg,#4a4f6a,#5c6280);
 }
+
+button.active{
+  outline:2px solid var(--accent);
+}
 </style>
 </head>
 
@@ -165,27 +166,97 @@ button{
   <div class="pomo-grid">
     <div>
       <label>Работа (мин)</label>
-      <input type="number" value="25">
+      <input id="workInput" type="number" value="25">
     </div>
     <div>
       <label>Отдых (мин)</label>
-      <input type="number" value="5">
+      <input id="breakInput" type="number" value="5">
     </div>
   </div>
 
-  <div class="timer">25:00</div>
+  <div id="timer" class="timer">25:00</div>
 
-  <!-- ВОЗВРАЩЕНЫ -->
   <div class="mode-buttons">
-    <button class="secondary">Работа</button>
-    <button class="secondary">Отдых</button>
+    <button id="workBtn" class="secondary active">Работа</button>
+    <button id="breakBtn" class="secondary">Отдых</button>
   </div>
 
   <div class="buttons">
-    <button class="primary">Старт</button>
-    <button class="secondary">Пауза</button>
+    <button id="startBtn" class="primary">Старт</button>
+    <button id="pauseBtn" class="secondary">Пауза</button>
   </div>
 </div>
+
+<script>
+let timerEl = document.getElementById('timer');
+let workInput = document.getElementById('workInput');
+let breakInput = document.getElementById('breakInput');
+
+let workBtn = document.getElementById('workBtn');
+let breakBtn = document.getElementById('breakBtn');
+let startBtn = document.getElementById('startBtn');
+let pauseBtn = document.getElementById('pauseBtn');
+
+let interval = null;
+let secondsLeft = workInput.value * 60;
+let mode = 'work';
+
+function updateTimer(){
+  let min = Math.floor(secondsLeft / 60);
+  let sec = secondsLeft % 60;
+  timerEl.textContent =
+    String(min).padStart(2,'0') + ':' +
+    String(sec).padStart(2,'0');
+}
+
+function setMode(newMode){
+  mode = newMode;
+  clearInterval(interval);
+  interval = null;
+
+  if(mode === 'work'){
+    secondsLeft = workInput.value * 60;
+    workBtn.classList.add('active');
+    breakBtn.classList.remove('active');
+  }else{
+    secondsLeft = breakInput.value * 60;
+    breakBtn.classList.add('active');
+    workBtn.classList.remove('active');
+  }
+  updateTimer();
+}
+
+startBtn.onclick = () => {
+  if(interval) return;
+  interval = setInterval(() => {
+    if(secondsLeft > 0){
+      secondsLeft--;
+      updateTimer();
+    }else{
+      clearInterval(interval);
+      interval = null;
+    }
+  },1000);
+};
+
+pauseBtn.onclick = () => {
+  clearInterval(interval);
+  interval = null;
+};
+
+workBtn.onclick = () => setMode('work');
+breakBtn.onclick = () => setMode('break');
+
+workInput.onchange = () => {
+  if(mode === 'work') setMode('work');
+};
+
+breakInput.onchange = () => {
+  if(mode === 'break') setMode('break');
+};
+
+updateTimer();
+</script>
 
 </body>
 </html>
