@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Матрица Эйзенхауэра</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -16,12 +15,7 @@
   --accent:#6f7dff;
 }
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:'Inter',sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif;}
 
 body{
   min-height:100vh;
@@ -33,21 +27,18 @@ body{
   color:var(--text);
 }
 
-/* HEADER */
 header{
   text-align:center;
-  padding:18px 16px 12px;
+  padding:18px;
   font-size:26px;
   font-weight:700;
   color:var(--accent);
 }
 
-/* BOARD */
+/* ===== MATRIX ===== */
 .board{
   padding:14px;
   display:grid;
-  grid-template-columns:1fr;
-  grid-template-rows:repeat(4, 90px);
   gap:12px;
 }
 
@@ -56,19 +47,14 @@ header{
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
   padding:16px 18px 16px 22px;
-  display:flex;
-  align-items:flex-start;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.04),
-    0 10px 24px rgba(0,0,0,.45);
+  box-shadow:0 10px 24px rgba(0,0,0,.45);
+  cursor:pointer;
 }
 
 .quadrant::before{
   content:'';
   position:absolute;
-  left:0;
-  top:0;
-  bottom:0;
+  left:0;top:0;bottom:0;
   width:5px;
   border-radius:22px 0 0 22px;
 }
@@ -78,18 +64,37 @@ header{
 .q3::before{background:#ffd666;}
 .q4::before{background:#6ee7b7;}
 
-h2{
-  font-size:14px;
-  font-weight:600;
+h2{font-size:14px;font-weight:600;margin-bottom:10px;}
+
+.tasks{display:flex;flex-direction:column;gap:8px;}
+
+.task{
+  background:#0f1324;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:13px;
 }
 
-/* POMODORO */
+.task small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
+}
+
+/* ===== POMODORO ===== */
 .pomodoro{
   margin:14px;
   padding:18px;
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
-  box-shadow:0 12px 28px rgba(0,0,0,.5);
+}
+
+.timer{
+  text-align:center;
+  font-size:44px;
+  font-weight:700;
+  margin:16px 0;
 }
 
 .pomo-grid{
@@ -98,56 +103,71 @@ h2{
   gap:12px;
 }
 
-label{
-  font-size:12px;
-  color:var(--muted);
-}
-
 input{
   width:100%;
-  margin-top:4px;
   padding:10px 12px;
   border-radius:12px;
   border:none;
   background:#0f1324;
-  color:#fff;
+  color:white;
 }
 
-.timer{
-  text-align:center;
-  font-size:44px;
-  font-weight:700;
-  margin:18px 0 14px;
-}
+label{font-size:12px;color:var(--muted);}
 
-.buttons,
-.mode-buttons{
+.mode-buttons,.buttons{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
+  gap:10px;
   margin-top:10px;
 }
 
+.buttons{grid-template-columns:1fr 1fr 1fr;}
+
 button{
-  padding:14px;
-  border-radius:16px;
+  padding:12px;
+  border-radius:14px;
   border:none;
   font-weight:600;
   cursor:pointer;
   color:white;
 }
 
-.primary{
-  background:linear-gradient(135deg,#6f7dff,#7f8cff);
+.primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
+.secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
+button.active{outline:2px solid var(--accent);}
+
+/* ===== MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
 }
 
-.secondary{
-  background:linear-gradient(135deg,#4a4f6a,#5c6280);
+.modal.active{display:flex;}
+
+.modal-box{
+  background:var(--panel);
+  border-radius:20px;
+  padding:18px;
+  width:90%;
+  max-width:360px;
 }
 
-button.active{
-  outline:2px solid var(--accent);
+.modal-box input,
+.modal-box textarea{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:none;
+  background:#0f1324;
+  color:white;
 }
+
+.modal-box textarea{resize:none;height:70px;}
 </style>
 </head>
 
@@ -156,10 +176,10 @@ button.active{
 <header>Матрица Эйзенхауэра</header>
 
 <div class="board">
-  <div class="quadrant q1"><h2>Важно · Срочно</h2></div>
-  <div class="quadrant q2"><h2>Важно · Не срочно</h2></div>
-  <div class="quadrant q3"><h2>Не важно · Срочно</h2></div>
-  <div class="quadrant q4"><h2>Не важно · Не срочно</h2></div>
+  <div class="quadrant q1" data-id="q1"><h2>Важно · Срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q2" data-id="q2"><h2>Важно · Не срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q3" data-id="q3"><h2>Не важно · Срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks"></div></div>
 </div>
 
 <div class="pomodoro">
@@ -184,78 +204,120 @@ button.active{
   <div class="buttons">
     <button id="startBtn" class="primary">Старт</button>
     <button id="pauseBtn" class="secondary">Пауза</button>
+    <button id="resetBtn" class="secondary">Сбросить</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <input id="taskTitle" placeholder="Название задачи">
+    <input id="taskDate" type="date">
+    <textarea id="taskComment" placeholder="Комментарий"></textarea>
+    <div class="mode-buttons">
+      <button class="primary" id="saveTask">Сохранить</button>
+      <button class="secondary" id="cancelTask">Отмена</button>
+    </div>
   </div>
 </div>
 
 <script>
-let timerEl = document.getElementById('timer');
-let workInput = document.getElementById('workInput');
-let breakInput = document.getElementById('breakInput');
+/* ===== TASKS ===== */
+let currentQuadrant=null;
+const modal=document.getElementById('modal');
+const data=JSON.parse(localStorage.getItem('tasks'))||{q1:[],q2:[],q3:[],q4:[]};
 
-let workBtn = document.getElementById('workBtn');
-let breakBtn = document.getElementById('breakBtn');
-let startBtn = document.getElementById('startBtn');
-let pauseBtn = document.getElementById('pauseBtn');
-
-let interval = null;
-let secondsLeft = workInput.value * 60;
-let mode = 'work';
-
-function updateTimer(){
-  let min = Math.floor(secondsLeft / 60);
-  let sec = secondsLeft % 60;
-  timerEl.textContent =
-    String(min).padStart(2,'0') + ':' +
-    String(sec).padStart(2,'0');
+function render(){
+  document.querySelectorAll('.quadrant').forEach(q=>{
+    const list=q.querySelector('.tasks');
+    list.innerHTML='';
+    data[q.dataset.id].forEach(t=>{
+      const d=document.createElement('div');
+      d.className='task';
+      d.innerHTML=`
+        ${t.title}
+        ${t.date?`<small>📅 ${t.date}</small>`:''}
+        ${t.comment?`<small>${t.comment}</small>`:''}`;
+      list.appendChild(d);
+    });
+  });
+  localStorage.setItem('tasks',JSON.stringify(data));
 }
 
-function setMode(newMode){
-  mode = newMode;
-  clearInterval(interval);
-  interval = null;
+document.querySelectorAll('.quadrant').forEach(q=>{
+  q.onclick=()=>{
+    currentQuadrant=q.dataset.id;
+    modal.classList.add('active');
+  };
+});
 
-  if(mode === 'work'){
-    secondsLeft = workInput.value * 60;
-    workBtn.classList.add('active');
-    breakBtn.classList.remove('active');
-  }else{
-    secondsLeft = breakInput.value * 60;
-    breakBtn.classList.add('active');
-    workBtn.classList.remove('active');
-  }
-  updateTimer();
+saveTask.onclick=()=>{
+  if(!taskTitle.value.trim())return;
+  data[currentQuadrant].push({
+    title:taskTitle.value,
+    date:taskDate.value,
+    comment:taskComment.value
+  });
+  taskTitle.value=taskDate.value=taskComment.value='';
+  modal.classList.remove('active');
+  render();
+};
+
+cancelTask.onclick=()=>modal.classList.remove('active');
+render();
+
+/* ===== REAL TIME POMODORO ===== */
+let mode='work';
+let duration=workInput.value*60*1000;
+let endTime=null;
+let raf=null;
+
+function format(ms){
+  ms=Math.max(0,ms);
+  const s=Math.floor(ms/1000);
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
 
-startBtn.onclick = () => {
-  if(interval) return;
-  interval = setInterval(() => {
-    if(secondsLeft > 0){
-      secondsLeft--;
-      updateTimer();
-    }else{
-      clearInterval(interval);
-      interval = null;
-    }
-  },1000);
-};
+function tick(){
+  const left=endTime-Date.now();
+  timer.textContent=format(left);
+  if(left<=0){cancelAnimationFrame(raf);raf=null;}
+  else raf=requestAnimationFrame(tick);
+}
 
-pauseBtn.onclick = () => {
-  clearInterval(interval);
-  interval = null;
-};
+function start(){
+  if(raf)return;
+  endTime=Date.now()+duration;
+  tick();
+}
 
-workBtn.onclick = () => setMode('work');
-breakBtn.onclick = () => setMode('break');
+function pause(){
+  if(!raf)return;
+  duration=endTime-Date.now();
+  cancelAnimationFrame(raf);
+  raf=null;
+}
 
-workInput.onchange = () => {
-  if(mode === 'work') setMode('work');
-};
+function reset(){
+  pause();
+  duration=(mode==='work'?workInput.value:breakInput.value)*60*1000;
+  timer.textContent=format(duration);
+}
 
-breakInput.onchange = () => {
-  if(mode === 'break') setMode('break');
-};
+function setMode(m){
+  mode=m;
+  reset();
+  workBtn.classList.toggle('active',m==='work');
+  breakBtn.classList.toggle('active',m==='break');
+}
 
-updateTimer();
+startBtn.onclick=start;
+pauseBtn.onclick=pause;
+resetBtn.onclick=reset;
+workBtn.onclick=()=>setMode('work');
+breakBtn.onclick=()=>setMode('break');
+
+reset();
 </script>
 
 </body>
