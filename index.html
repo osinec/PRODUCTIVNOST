@@ -36,51 +36,38 @@ header{
 }
 
 /* ===== MATRIX ===== */
-.board{
-  padding:14px;
-  display:grid;
-  gap:12px;
-}
-
+.board{padding:14px;display:grid;gap:12px;}
 .quadrant{
   position:relative;
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
-  padding:16px 18px 16px 22px;
+  padding:16px 18px 18px 22px;
   box-shadow:0 10px 24px rgba(0,0,0,.45);
-  cursor:pointer;
 }
-
 .quadrant::before{
   content:'';
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:5px;
+  position:absolute;left:0;top:0;bottom:0;width:5px;
   border-radius:22px 0 0 22px;
 }
-
 .q1::before{background:#ff6b6b;}
 .q2::before{background:#4dabff;}
 .q3::before{background:#ffd666;}
 .q4::before{background:#6ee7b7;}
 
 h2{font-size:14px;font-weight:600;margin-bottom:10px;}
-
-.tasks{display:flex;flex-direction:column;gap:8px;}
+.tasks{display:flex;flex-direction:column;gap:8px;min-height:20px;}
 
 .task{
-  background:#0f1324;
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
+  cursor:grab;
 }
-
-.task small{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  margin-top:4px;
-}
+.task.q1{background:#ff6b6b;}
+.task.q2{background:#4dabff;}
+.task.q3{background:#ffd666;color:#222;}
+.task.q4{background:#6ee7b7;color:#222;}
+.task small{display:block;font-size:11px;opacity:.75;margin-top:4px;}
 
 /* ===== POMODORO ===== */
 .pomodoro{
@@ -89,84 +76,39 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
 }
-
-.timer{
-  text-align:center;
-  font-size:44px;
-  font-weight:700;
-  margin:16px 0;
-}
-
-.pomo-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-input{
-  width:100%;
-  padding:10px 12px;
-  border-radius:12px;
-  border:none;
-  background:#0f1324;
-  color:white;
-}
-
+.timer{text-align:center;font-size:44px;font-weight:700;margin:16px 0;}
+.pomo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 label{font-size:12px;color:var(--muted);}
-
+input{
+  width:100%;padding:10px 12px;border-radius:12px;
+  border:none;background:#0f1324;color:white;
+}
 .mode-buttons,.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;
 }
-
 .buttons{grid-template-columns:1fr 1fr 1fr;}
-
 button{
-  padding:12px;
-  border-radius:14px;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-  color:white;
+  padding:12px;border-radius:14px;border:none;
+  font-weight:600;cursor:pointer;color:white;
 }
-
 .primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
 .secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
 button.active{outline:2px solid var(--accent);}
 
 /* ===== MODAL ===== */
 .modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  align-items:center;
-  justify-content:center;
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;
 }
-
 .modal.active{display:flex;}
-
 .modal-box{
-  background:var(--panel);
-  border-radius:20px;
-  padding:18px;
-  width:90%;
-  max-width:360px;
+  background:var(--panel);border-radius:20px;
+  padding:18px;width:90%;max-width:360px;
 }
-
-.modal-box input,
-.modal-box textarea{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px 12px;
-  border-radius:12px;
-  border:none;
-  background:#0f1324;
-  color:white;
+.modal-box input,.modal-box textarea{
+  width:100%;margin-bottom:10px;padding:10px 12px;
+  border-radius:12px;border:none;background:#0f1324;color:white;
 }
-
 .modal-box textarea{resize:none;height:70px;}
 </style>
 </head>
@@ -184,14 +126,8 @@ button.active{outline:2px solid var(--accent);}
 
 <div class="pomodoro">
   <div class="pomo-grid">
-    <div>
-      <label>Работа (мин)</label>
-      <input id="workInput" type="number" value="25">
-    </div>
-    <div>
-      <label>Отдых (мин)</label>
-      <input id="breakInput" type="number" value="5">
-    </div>
+    <div><label>Работа (мин)</label><input id="workInput" type="number" value="25"></div>
+    <div><label>Отдых (мин)</label><input id="breakInput" type="number" value="5"></div>
   </div>
 
   <div id="timer" class="timer">25:00</div>
@@ -208,7 +144,6 @@ button.active{outline:2px solid var(--accent);}
   </div>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <input id="taskTitle" placeholder="Название задачи">
@@ -222,22 +157,45 @@ button.active{outline:2px solid var(--accent);}
 </div>
 
 <script>
+/* ===== NOTIFICATION PERMISSION ===== */
+if ("Notification" in window && Notification.permission === "default") {
+  Notification.requestPermission();
+}
+
+/* ===== SOUND ===== */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(){
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.value = 880;
+  g.gain.value = 0.1;
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start();
+  o.stop(audioCtx.currentTime + 0.5);
+}
+
 /* ===== TASKS ===== */
-let currentQuadrant=null;
+let currentQuadrant=null, dragged=null;
 const modal=document.getElementById('modal');
 const data=JSON.parse(localStorage.getItem('tasks'))||{q1:[],q2:[],q3:[],q4:[]};
 
 function render(){
   document.querySelectorAll('.quadrant').forEach(q=>{
+    const id=q.dataset.id;
     const list=q.querySelector('.tasks');
     list.innerHTML='';
-    data[q.dataset.id].forEach(t=>{
+    data[id].forEach((t,i)=>{
       const d=document.createElement('div');
-      d.className='task';
+      d.className=`task ${id}`;
+      d.draggable=true;
+      d.dataset.index=i;
+      d.dataset.from=id;
       d.innerHTML=`
         ${t.title}
         ${t.date?`<small>📅 ${t.date}</small>`:''}
         ${t.comment?`<small>${t.comment}</small>`:''}`;
+      d.ondragstart=()=>dragged=d;
       list.appendChild(d);
     });
   });
@@ -245,9 +203,22 @@ function render(){
 }
 
 document.querySelectorAll('.quadrant').forEach(q=>{
-  q.onclick=()=>{
+  q.onclick=e=>{
+    if(e.target.closest('.task'))return;
     currentQuadrant=q.dataset.id;
     modal.classList.add('active');
+  };
+  q.ondragover=e=>e.preventDefault();
+  q.ondrop=()=>{
+    if(!dragged)return;
+    const from=dragged.dataset.from;
+    const to=q.dataset.id;
+    const idx=dragged.dataset.index;
+    const item=data[from][idx];
+    data[from].splice(idx,1);
+    data[to].push(item);
+    dragged=null;
+    render();
   };
 });
 
@@ -262,15 +233,15 @@ saveTask.onclick=()=>{
   modal.classList.remove('active');
   render();
 };
-
 cancelTask.onclick=()=>modal.classList.remove('active');
 render();
 
-/* ===== REAL TIME POMODORO ===== */
+/* ===== REAL TIME TIMER ===== */
 let mode='work';
-let duration=workInput.value*60*1000;
+let duration=workInput.value*60000;
 let endTime=null;
 let raf=null;
+let finished=false;
 
 function format(ms){
   ms=Math.max(0,ms);
@@ -278,15 +249,32 @@ function format(ms){
   return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 }
 
+function notify(){
+  playSound();
+  if(Notification.permission==="granted"){
+    new Notification("⏰ Таймер завершён",{
+      body: mode==='work' ? "Пора отдыхать" : "Пора работать"
+    });
+  }
+}
+
 function tick(){
   const left=endTime-Date.now();
   timer.textContent=format(left);
-  if(left<=0){cancelAnimationFrame(raf);raf=null;}
-  else raf=requestAnimationFrame(tick);
+  if(left<=0 && !finished){
+    finished=true;
+    notify();
+    cancelAnimationFrame(raf);
+    raf=null;
+  } else if(left>0){
+    raf=requestAnimationFrame(tick);
+  }
 }
 
 function start(){
   if(raf)return;
+  audioCtx.resume();
+  finished=false;
   endTime=Date.now()+duration;
   tick();
 }
@@ -300,7 +288,8 @@ function pause(){
 
 function reset(){
   pause();
-  duration=(mode==='work'?workInput.value:breakInput.value)*60*1000;
+  finished=false;
+  duration=(mode==='work'?workInput.value:breakInput.value)*60000;
   timer.textContent=format(duration);
 }
 
