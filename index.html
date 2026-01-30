@@ -35,7 +35,6 @@ header{
   color:var(--accent);
 }
 
-/* ===== MATRIX ===== */
 .board{padding:14px;display:grid;gap:12px;}
 .quadrant{
   position:relative;
@@ -55,21 +54,33 @@ header{
 .q4::before{background:#6ee7b7;}
 
 h2{font-size:14px;font-weight:600;margin-bottom:10px;}
-.tasks{display:flex;flex-direction:column;gap:8px;min-height:20px;}
+.tasks{display:flex;flex-direction:column;gap:8px;}
 
 .task{
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
   cursor:grab;
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
 }
+.task.completed{
+  opacity:.55;
+  text-decoration:line-through;
+}
+.task input[type="checkbox"]{
+  margin-top:3px;
+  cursor:pointer;
+}
+.task-content{flex:1}
+
 .task.q1{background:#ff6b6b;}
 .task.q2{background:#4dabff;}
 .task.q3{background:#ffd666;color:#222;}
 .task.q4{background:#6ee7b7;color:#222;}
 .task small{display:block;font-size:11px;opacity:.75;margin-top:4px;}
 
-/* ===== POMODORO ===== */
 .pomodoro{
   margin:14px;
   padding:18px;
@@ -95,7 +106,6 @@ button{
 .secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
 button.active{outline:2px solid var(--accent);}
 
-/* ===== MODAL ===== */
 .modal{
   position:fixed;inset:0;background:rgba(0,0,0,.6);
   display:none;align-items:center;justify-content:center;
@@ -124,26 +134,6 @@ button.active{outline:2px solid var(--accent);}
   <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks"></div></div>
 </div>
 
-<div class="pomodoro">
-  <div class="pomo-grid">
-    <div><label>Работа (мин)</label><input id="workInput" type="number" value="25"></div>
-    <div><label>Отдых (мин)</label><input id="breakInput" type="number" value="5"></div>
-  </div>
-
-  <div id="timer" class="timer">25:00</div>
-
-  <div class="mode-buttons">
-    <button id="workBtn" class="secondary active">Работа</button>
-    <button id="breakBtn" class="secondary">Отдых</button>
-  </div>
-
-  <div class="buttons">
-    <button id="startBtn" class="primary">Старт</button>
-    <button id="pauseBtn" class="secondary">Пауза</button>
-    <button id="resetBtn" class="secondary">Сбросить</button>
-  </div>
-</div>
-
 <div class="modal" id="modal">
   <div class="modal-box">
     <input id="taskTitle" placeholder="Название задачи">
@@ -162,64 +152,53 @@ button.active{outline:2px solid var(--accent);}
 </div>
 
 <script>
-/* ===== NOTIFICATIONS ===== */
-if ("Notification" in window && Notification.permission === "default") {
-  Notification.requestPermission();
-}
+let currentQuadrant=null;
+let editIndex=null;
+let dragged=null;
 
-/* ===== SOUND ===== */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(){
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  o.frequency.value = 880;
-  g.gain.value = 0.1;
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start();
-  o.stop(audioCtx.currentTime + 0.4);
-}
+const modal=document.getElementById('modal');
 
-/* ===== TASKS ===== */
-let currentQuadrant = null;
-let editIndex = null;
-let dragged = null;
-
-const modal = document.getElementById('modal');
-
-const data = JSON.parse(localStorage.getItem('tasks')) || {
-  q1:[], q2:[], q3:[], q4:[]
+const data=JSON.parse(localStorage.getItem('tasks')) || {
+  q1:[],q2:[],q3:[],q4:[]
 };
 
 function render(){
   document.querySelectorAll('.quadrant').forEach(q=>{
-    const id = q.dataset.id;
-    const list = q.querySelector('.tasks');
-    list.innerHTML = '';
+    const id=q.dataset.id;
+    const list=q.querySelector('.tasks');
+    list.innerHTML='';
 
     data[id].forEach((t,i)=>{
-      const d = document.createElement('div');
-      d.className = `task ${id}`;
-      d.draggable = true;
-      d.dataset.index = i;
-      d.dataset.from = id;
+      const d=document.createElement('div');
+      d.className=`task ${id} ${t.done?'completed':''}`;
+      d.draggable=true;
+      d.dataset.index=i;
+      d.dataset.from=id;
 
-      d.innerHTML = `
-        ${t.title}
-        ${t.date ? `<small>📅 ${t.date}</small>` : ''}
-        ${t.comment ? `<small>${t.comment}</small>` : ''}
+      d.innerHTML=`
+        <input type="checkbox" ${t.done?'checked':''}>
+        <div class="task-content">
+          ${t.title}
+          ${t.date?`<small>📅 ${t.date}</small>`:''}
+          ${t.comment?`<small>${t.comment}</small>`:''}
+        </div>
       `;
 
-      d.ondragstart = () => dragged = d;
-
-      d.onclick = (e) => {
+      d.querySelector('input').onclick=e=>{
         e.stopPropagation();
-        currentQuadrant = id;
-        editIndex = i;
+        t.done=!t.done;
+        render();
+      };
 
-        taskTitle.value = t.title;
-        taskDate.value = t.date || '';
-        taskComment.value = t.comment || '';
+      d.ondragstart=()=>dragged=d;
 
+      d.onclick=e=>{
+        e.stopPropagation();
+        currentQuadrant=id;
+        editIndex=i;
+        taskTitle.value=t.title;
+        taskDate.value=t.date||'';
+        taskComment.value=t.comment||'';
         modal.classList.add('active');
       };
 
@@ -227,50 +206,50 @@ function render(){
     });
   });
 
-  localStorage.setItem('tasks', JSON.stringify(data));
+  localStorage.setItem('tasks',JSON.stringify(data));
 }
 
 document.querySelectorAll('.quadrant').forEach(q=>{
-  q.onclick = () => {
-    currentQuadrant = q.dataset.id;
-    editIndex = null;
+  q.onclick=()=>{
+    currentQuadrant=q.dataset.id;
+    editIndex=null;
     modal.classList.add('active');
   };
 
-  q.ondragover = e => e.preventDefault();
-
-  q.ondrop = () => {
-    if(!dragged) return;
-    const from = dragged.dataset.from;
-    const to = q.dataset.id;
-    const idx = dragged.dataset.index;
-    const item = data[from][idx];
-
+  q.ondragover=e=>e.preventDefault();
+  q.ondrop=()=>{
+    if(!dragged)return;
+    const from=dragged.dataset.from;
+    const to=q.dataset.id;
+    const idx=dragged.dataset.index;
+    const item=data[from][idx];
     data[from].splice(idx,1);
     data[to].push(item);
-    dragged = null;
+    dragged=null;
     render();
   };
 });
 
 function closeModal(){
   modal.classList.remove('active');
-  taskTitle.value = taskDate.value = taskComment.value = '';
-  editIndex = null;
+  taskTitle.value=taskDate.value=taskComment.value='';
+  editIndex=null;
 }
 
-saveTask.onclick = () => {
-  if(!taskTitle.value.trim()) return;
+saveTask.onclick=()=>{
+  if(!taskTitle.value.trim())return;
 
-  const task = {
-    title: taskTitle.value,
-    date: taskDate.value,
-    comment: taskComment.value
+  const task={
+    title:taskTitle.value,
+    date:taskDate.value,
+    comment:taskComment.value,
+    done:false
   };
 
-  if(editIndex !== null){
-    data[currentQuadrant][editIndex] = task;
-  } else {
+  if(editIndex!==null){
+    task.done=data[currentQuadrant][editIndex].done;
+    data[currentQuadrant][editIndex]=task;
+  }else{
     data[currentQuadrant].push(task);
   }
 
@@ -278,87 +257,15 @@ saveTask.onclick = () => {
   render();
 };
 
-deleteTask.onclick = () => {
-  if(editIndex === null) return;
+deleteTask.onclick=()=>{
+  if(editIndex===null)return;
   data[currentQuadrant].splice(editIndex,1);
   closeModal();
   render();
 };
 
-cancelTask.onclick = closeModal;
+cancelTask.onclick=closeModal;
 render();
-
-/* ===== TIMER ===== */
-let mode='work';
-let duration=workInput.value*60000;
-let endTime=null;
-let raf=null;
-let finished=false;
-
-function format(ms){
-  ms=Math.max(0,ms);
-  const s=Math.floor(ms/1000);
-  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-}
-
-function notify(){
-  playSound();
-  if(Notification.permission==="granted"){
-    new Notification("⏰ Таймер завершён",{
-      body: mode==='work' ? "Пора отдыхать" : "Пора работать"
-    });
-  }
-}
-
-function tick(){
-  const left=endTime-Date.now();
-  timer.textContent=format(left);
-  if(left<=0 && !finished){
-    finished=true;
-    notify();
-    cancelAnimationFrame(raf);
-    raf=null;
-  } else if(left>0){
-    raf=requestAnimationFrame(tick);
-  }
-}
-
-function start(){
-  if(raf)return;
-  audioCtx.resume();
-  finished=false;
-  endTime=Date.now()+duration;
-  tick();
-}
-
-function pause(){
-  if(!raf)return;
-  duration=endTime-Date.now();
-  cancelAnimationFrame(raf);
-  raf=null;
-}
-
-function reset(){
-  pause();
-  finished=false;
-  duration=(mode==='work'?workInput.value:breakInput.value)*60000;
-  timer.textContent=format(duration);
-}
-
-function setMode(m){
-  mode=m;
-  reset();
-  workBtn.classList.toggle('active',m==='work');
-  breakBtn.classList.toggle('active',m==='break');
-}
-
-startBtn.onclick=start;
-pauseBtn.onclick=pause;
-resetBtn.onclick=reset;
-workBtn.onclick=()=>setMode('work');
-breakBtn.onclick=()=>setMode('break');
-
-reset();
 </script>
 
 </body>
