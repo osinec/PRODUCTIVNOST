@@ -35,19 +35,15 @@ header{
   color:var(--accent);
 }
 
-/* === MATRIX === */
 .board{
   padding:14px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  grid-template-rows:auto auto;
   gap:12px;
 }
 
-@media (max-width:720px){
-  .board{
-    grid-template-columns:1fr;
-  }
+@media(max-width:720px){
+  .board{grid-template-columns:1fr;}
 }
 
 .quadrant{
@@ -79,13 +75,11 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   gap:8px;
 }
 
-/* unlimited tasks */
 .task{
   padding:10px 12px;
   border-radius:12px;
   font-size:13px;
   cursor:pointer;
-  transition:.25s;
   user-select:none;
 }
 
@@ -94,6 +88,12 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
 .task.q3{background:#ffd666;color:#222;}
 .task.q4{background:#6ee7b7;color:#222;}
 
+.task.done{
+  opacity:.35;
+  text-decoration:line-through;
+  filter:grayscale(1);
+}
+
 .task small{
   display:block;
   font-size:11px;
@@ -101,67 +101,7 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   margin-top:4px;
 }
 
-.task.done{
-  opacity:.35;
-  text-decoration:line-through;
-  filter:grayscale(1);
-}
-
-/* === POMODORO === */
-.pomodoro{
-  margin:14px;
-  padding:18px;
-  background:linear-gradient(180deg,#1e2334,#191d2b);
-  border-radius:22px;
-}
-
-.timer{
-  text-align:center;
-  font-size:44px;
-  font-weight:700;
-  margin:16px 0;
-}
-
-.pomo-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-label{font-size:12px;color:var(--muted);}
-
-input{
-  width:100%;
-  padding:10px 12px;
-  border-radius:12px;
-  border:none;
-  background:#0f1324;
-  color:white;
-}
-
-.mode-buttons,.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.buttons{grid-template-columns:1fr 1fr 1fr;}
-
-button{
-  padding:12px;
-  border-radius:14px;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-  color:white;
-}
-
-.primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
-.secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
-button.active{outline:2px solid var(--accent);}
-
-/* === MODAL === */
+/* MODAL */
 #modal{
   display:none;
   position:fixed;
@@ -189,6 +129,18 @@ button.active{outline:2px solid var(--accent);}
   color:white;
   border:none;
 }
+
+button{
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  color:white;
+}
+
+.primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
+.secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
 </style>
 </head>
 
@@ -197,33 +149,13 @@ button.active{outline:2px solid var(--accent);}
 <header>Матрица Эйзенхауэра</header>
 
 <div class="board">
-  <div class="quadrant q1" data-id="q1"><h2>Важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-  <div class="quadrant q2" data-id="q2"><h2>Важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-  <div class="quadrant q3" data-id="q3"><h2>Не важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-  <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+  <div class="quadrant q1" data-id="q1"><h2>Важно · Срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q2" data-id="q2"><h2>Важно · Не срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q3" data-id="q3"><h2>Не важно · Срочно</h2><div class="tasks"></div></div>
+  <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks"></div></div>
 </div>
 
-<div class="pomodoro">
-  <div class="pomo-grid">
-    <div><label>Работа (мин)</label><input id="workInput" type="number" value="25"></div>
-    <div><label>Отдых (мин)</label><input id="breakInput" type="number" value="5"></div>
-  </div>
-
-  <div id="timer" class="timer">25:00</div>
-
-  <div class="mode-buttons">
-    <button id="workBtn" class="secondary active">Работа</button>
-    <button id="breakBtn" class="secondary">Отдых</button>
-  </div>
-
-  <div class="buttons">
-    <button id="startBtn" class="primary">Старт</button>
-    <button id="pauseBtn" class="secondary">Пауза</button>
-    <button id="resetBtn" class="secondary">Сбросить</button>
-  </div>
-</div>
-
-<!-- Modal -->
+<!-- MODAL -->
 <div id="modal">
   <div id="modalContent">
     <h3 id="modalTitle">Новая задача</h3>
@@ -235,73 +167,115 @@ button.active{outline:2px solid var(--accent);}
 </div>
 
 <script>
-let tasks=JSON.parse(localStorage.getItem('eisenhowerTasks'))||{};
-let currentQuadrantId=null;
-let editingTaskId=null;
+/* ===== DOM ===== */
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+const taskTitle = document.getElementById('taskTitle');
+const taskComment = document.getElementById('taskComment');
+const saveTaskBtn = document.getElementById('saveTaskBtn');
+const cancelTaskBtn = document.getElementById('cancelTaskBtn');
 
-function saveTasks(){localStorage.setItem('eisenhowerTasks',JSON.stringify(tasks));}
+/* ===== DATA ===== */
+let tasks = JSON.parse(localStorage.getItem('eisenhowerTasks')) || {};
+let currentQuadrantId = null;
+let editingTaskId = null;
+
+function saveTasks(){
+  localStorage.setItem('eisenhowerTasks', JSON.stringify(tasks));
+}
 
 function renderTasks(){
   document.querySelectorAll('.tasks').forEach(t=>t.innerHTML='');
+
   for(const [qid,list] of Object.entries(tasks)){
-    const c=document.querySelector(`.quadrant[data-id="${qid}"] .tasks`);
-    if(!c)continue;
+    const container = document.querySelector(`.quadrant[data-id="${qid}"] .tasks`);
+    if(!container) continue;
+
     list.forEach(task=>{
-      const el=document.createElement('div');
-      el.className=`task ${qid}`+(task.done?' done':'');
-      el.draggable=true;
-      el.innerHTML=`${task.title}${task.comment?`<small>${task.comment}</small>`:''}`;
-      el.onclick=()=>{task.done=!task.done;saveTasks();renderTasks();}
-      el.ondblclick=e=>{e.stopPropagation();editTask(qid,task.id);}
-      el.ondragstart=e=>e.dataTransfer.setData('text',JSON.stringify({id:task.id,from:qid}));
-      c.appendChild(el);
+      const el = document.createElement('div');
+      el.className = `task ${qid}` + (task.done?' done':'');
+      el.draggable = true;
+      el.innerHTML = task.title + (task.comment?`<small>${task.comment}</small>`:'');
+
+      el.onclick = ()=>{task.done=!task.done;saveTasks();renderTasks();};
+      el.ondblclick = e=>{e.stopPropagation();openEdit(qid,task.id);};
+
+      el.ondragstart = e=>{
+        e.dataTransfer.setData('text/plain', JSON.stringify({id:task.id,from:qid}));
+      };
+
+      container.appendChild(el);
     });
   }
 }
 
-function editTask(q,id){
-  const t=tasks[q].find(x=>x.id===id);
-  currentQuadrantId=q;editingTaskId=id;
-  taskTitle.value=t.title;taskComment.value=t.comment||'';
+function openEdit(qid,id){
+  const t = tasks[qid].find(x=>x.id===id);
+  currentQuadrantId=qid;
+  editingTaskId=id;
+  modalTitle.textContent='Редактировать задачу';
+  taskTitle.value=t.title;
+  taskComment.value=t.comment||'';
   modal.style.display='flex';
 }
 
+/* ===== ADD ===== */
 document.querySelectorAll('.quadrant').forEach(q=>{
-  q.querySelector('.tasks').onclick=e=>{
-    if(e.target.closest('.task'))return;
-    currentQuadrantId=q.dataset.id;editingTaskId=null;
-    taskTitle.value='';taskComment.value='';
+  q.querySelector('.tasks').onclick = e=>{
+    if(e.target.closest('.task')) return;
+    currentQuadrantId=q.dataset.id;
+    editingTaskId=null;
+    modalTitle.textContent='Новая задача';
+    taskTitle.value='';
+    taskComment.value='';
     modal.style.display='flex';
-  }
+  };
 });
 
 saveTaskBtn.onclick=()=>{
-  const title=taskTitle.value.trim();
-  if(!title)return alert('Введите название');
+  const title = taskTitle.value.trim();
+  if(!title) return alert('Введите название');
+
   if(editingTaskId){
-    const t=tasks[currentQuadrantId].find(x=>x.id===editingTaskId);
-    t.title=title;t.comment=taskComment.value;
+    const t = tasks[currentQuadrantId].find(x=>x.id===editingTaskId);
+    t.title=title;
+    t.comment=taskComment.value;
   }else{
-    tasks[currentQuadrantId]??=[];
-    tasks[currentQuadrantId].push({id:Date.now()+'' ,title,comment:taskComment.value,done:false});
+    tasks[currentQuadrantId] ??= [];
+    tasks[currentQuadrantId].push({
+      id:Date.now().toString(),
+      title,
+      comment:taskComment.value,
+      done:false
+    });
   }
+
   modal.style.display='none';
-  saveTasks();renderTasks();
+  saveTasks();
+  renderTasks();
 };
 
 cancelTaskBtn.onclick=()=>modal.style.display='none';
 modal.onclick=e=>{if(e.target===modal)modal.style.display='none';};
 
-function allowDrop(e){e.preventDefault();}
-function drop(e){
-  e.preventDefault();
-  const d=JSON.parse(e.dataTransfer.getData('text'));
-  const to=e.currentTarget.closest('.quadrant').dataset.id;
-  if(d.from===to)return;
-  const t=tasks[d.from].splice(tasks[d.from].findIndex(x=>x.id===d.id),1)[0];
-  tasks[to]??=[];tasks[to].push(t);
-  saveTasks();renderTasks();
-}
+/* ===== DRAG ===== */
+document.querySelectorAll('.tasks').forEach(t=>{
+  t.ondragover=e=>e.preventDefault();
+  t.ondrop=e=>{
+    e.preventDefault();
+    const d=JSON.parse(e.dataTransfer.getData('text/plain'));
+    const to=e.currentTarget.closest('.quadrant').dataset.id;
+    if(d.from===to) return;
+
+    const fromList=tasks[d.from];
+    const idx=fromList.findIndex(x=>x.id===d.id);
+    const task=fromList.splice(idx,1)[0];
+    tasks[to]??=[];
+    tasks[to].push(task);
+    saveTasks();
+    renderTasks();
+  };
+});
 
 renderTasks();
 </script>
