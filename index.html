@@ -1,2 +1,431 @@
-<!DOCTYPE html> <html lang="ru"> <head> <meta charset="UTF-8"> <title>Матрица Эйзенхауэра</title> <meta name="viewport" content="width=device-width, initial-scale=1"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"> <style> :root{ --bg:#0d1020; --panel:#1b1f2e; --text:#f5f6fa; --muted:#9aa0b5; --accent:#6f7dff; } *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif;} body{ min-height:100vh; background: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px), var(--bg); background-size:40px 40px; color:var(--text); } header{ text-align:center; padding:18px; font-size:26px; font-weight:700; color:var(--accent); } .board{padding:14px;display:grid;gap:12px;} .quadrant{ position:relative; background:linear-gradient(180deg,#1e2334,#191d2b); border-radius:22px; padding:16px 18px 18px 22px; box-shadow:0 10px 24px rgba(0,0,0,.45); } .quadrant::before{ content:''; position:absolute;left:0;top:0;bottom:0;width:5px; border-radius:22px 0 0 22px; } .q1::before{background:#ff6b6b;} .q2::before{background:#4dabff;} .q3::before{background:#ffd666;} .q4::before{background:#6ee7b7;} h2{font-size:14px;font-weight:600;margin-bottom:10px;} .tasks{ display:flex; flex-direction:column; gap:8px; min-height:40px; } .task{ padding:10px 12px; border-radius:12px; font-size:13px; cursor:pointer; transition:.25s; user-select:none; } .task.q1{background:#ff6b6b;} .task.q2{background:#4dabff;} .task.q3{background:#ffd666;color:#222;} .task.q4{background:#6ee7b7;color:#222;} .task small{display:block;font-size:11px;opacity:.75;margin-top:4px;} .task.done{ opacity:.35; text-decoration:line-through; filter:grayscale(1); } .pomodoro{ margin:14px; padding:18px; background:linear-gradient(180deg,#1e2334,#191d2b); border-radius:22px; } .timer{text-align:center;font-size:44px;font-weight:700;margin:16px 0;} .pomo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;} label{font-size:12px;color:var(--muted);} input{ width:100%;padding:10px 12px;border-radius:12px; border:none;background:#0f1324;color:white; } .mode-buttons,.buttons{ display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px; } .buttons{grid-template-columns:1fr 1fr 1fr;} button{ padding:12px;border-radius:14px;border:none; font-weight:600;cursor:pointer;color:white; } .primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);} .secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);} button.active{outline:2px solid var(--accent);} /* MODAL */ #modal{ display:none; position:fixed; top:0;left:0;right:0;bottom:0; background:rgba(0,0,0,0.7); z-index:100; justify-content:center; align-items:center; } #modalContent{ background:var(--panel); padding:20px; border-radius:16px; width:90%; max-width:400px; color:var(--text); } #modal h3{margin-bottom:12px;} #modal input, #modal textarea{ width:100%; padding:10px; margin-bottom:12px; border-radius:10px; background:#0f1324; color:white; border:none; } #modal button{ width:100%; margin-top:8px; } </style> </head> <body> <header>Матрица Эйзенхауэра</header> <div class="board"> <div class="quadrant q1" data-id="q1"><h2>Важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div> <div class="quadrant q2" data-id="q2"><h2>Важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div> <div class="quadrant q3" data-id="q3"><h2>Не важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div> <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div> </div> <div class="pomodoro"> <div class="pomo-grid"> <div><label>Работа (мин)</label><input id="workInput" type="number" value="25"></div> <div><label>Отдых (мин)</label><input id="breakInput" type="number" value="5"></div> </div> <div id="timer" class="timer">25:00</div> <div class="mode-buttons"> <button id="workBtn" class="secondary active">Работа</button> <button id="breakBtn" class="secondary">Отдых</button> </div> <div class="buttons"> <button id="startBtn" class="primary">Старт</button> <button id="pauseBtn" class="secondary">Пауза</button> <button id="resetBtn" class="secondary">Сбросить</button> </div> </div> <!-- Modal --> <div id="modal"> <div id="modalContent"> <h3 id="modalTitle">Новая задача</h3> <input type="text" id="taskTitle" placeholder="Название задачи"> <textarea id="taskComment" placeholder="Комментарий (необязательно)" rows="3"></textarea> <button id="saveTaskBtn" class="primary">Сохранить</button> <button id="cancelTaskBtn" class="secondary">Отмена</button> </div> </div> <script> // ===== NOTIFICATIONS & SOUND ===== if ("Notification" in window && Notification.permission === "default") { Notification.requestPermission(); } const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); function playSound(){ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.frequency.value = 880; g.gain.value = 0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.3); } function playFinishSound(times = 3, interval = 450){ let count = 0; const id = setInterval(() => { playSound(); count++; if(count >= times) clearInterval(id); }, interval); } // ===== TIMER ===== let mode='work'; let duration=25*60000; let endTime=null; let raf=null; let finished=false; function format(ms){ ms=Math.max(0,ms); const s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); } function notify(){ playFinishSound(3); if(Notification.permission==="granted"){ new Notification("⏰ Таймер завершён",{ body: mode==='work' ? "Пора отдыхать" : "Пора работать" }); } } function tick(){ const left=endTime-Date.now(); timer.textContent=format(left); if(left<=0 && !finished){ finished=true; notify(); cancelAnimationFrame(raf); raf=null; } else if(left>0){ raf=requestAnimationFrame(tick); } } function start(){ if(raf)return; audioCtx.resume(); finished=false; endTime=Date.now()+duration; tick(); } function pause(){ if(!raf)return; duration=endTime-Date.now(); cancelAnimationFrame(raf); raf=null; } function reset(){ pause(); finished=false; duration=(mode==='work'?parseInt(workInput.value)||25:parseInt(breakInput.value)||5)*60000; timer.textContent=format(duration); } function setMode(m){ mode=m; reset(); workBtn.classList.toggle('active',m==='work'); breakBtn.classList.toggle('active',m==='break'); } document.getElementById('startBtn').onclick=start; document.getElementById('pauseBtn').onclick=pause; document.getElementById('resetBtn').onclick=reset; document.getElementById('workBtn').onclick=()=>setMode('work'); document.getElementById('breakBtn').onclick=()=>setMode('break'); reset(); // ===== TASKS SYSTEM ===== let currentQuadrantId = null; let editingTaskId = null; let tasks = JSON.parse(localStorage.getItem('eisenhowerTasks')) || {}; function saveTasks() { localStorage.setItem('eisenhowerTasks', JSON.stringify(tasks)); } function renderTasks() { document.querySelectorAll('.tasks').forEach(el => el.innerHTML = ''); for (const [quadId, taskList] of Object.entries(tasks)) { const container = document.querySelector(.quadrant[data-id="${quadId}"] .tasks); if (!container) continue; taskList.forEach(task => { const el = document.createElement('div'); el.className = task ${quadId}; el.draggable = true; el.dataset.id = task.id; el.innerHTML = ${task.title} ${task.comment ? <small>${task.comment}</small> : ''} ; el.ondragstart = (e) => { e.dataTransfer.setData('text/plain', JSON.stringify({ taskId: task.id, fromQuad: quadId })); }; el.onclick = () => { el.classList.toggle('done'); task.done = el.classList.contains('done'); saveTasks(); }; el.ondblclick = (e) => { e.stopPropagation(); editTask(quadId, task.id); }; container.appendChild(el); }); } } function addTaskToQuadrant(quadId, title, comment = '') { if (!tasks[quadId]) tasks[quadId] = []; const newTask = { id: Date.now().toString(), title, comment, done: false }; tasks[quadId].push(newTask); saveTasks(); renderTasks(); } function editTask(quadId, taskId) { const task = tasks[quadId].find(t => t.id === taskId); if (!task) return; editingTaskId = taskId; currentQuadrantId = quadId; document.getElementById('modalTitle').textContent = 'Редактировать задачу'; document.getElementById('taskTitle').value = task.title; document.getElementById('taskComment').value = task.comment || ''; document.getElementById('modal').style.display = 'flex'; } // Назначаем обработчики кликов по квадрантам document.querySelectorAll('.quadrant').forEach(quadrant => { const tasksContainer = quadrant.querySelector('.tasks'); tasksContainer.addEventListener('click', (e) => { // Если кликнули на задачу — ничего не делаем (обработка в renderTasks) if (e.target.closest('.task')) return; // Иначе — открываем модалку для добавления currentQuadrantId = quadrant.dataset.id; editingTaskId = null; document.getElementById('modalTitle').textContent = 'Новая задача'; document.getElementById('taskTitle').value = ''; document.getElementById('taskComment').value = ''; document.getElementById('modal').style.display = 'flex'; }); }); document.getElementById('saveTaskBtn').onclick = () => { const title = document.getElementById('taskTitle').value.trim(); const comment = document.getElementById('taskComment').value.trim(); if (!title) { alert('Введите название задачи'); return; } if (editingTaskId) { const task = tasks[currentQuadrantId].find(t => t.id === editingTaskId); if (task) { task.title = title; task.comment = comment; } } else { addTaskToQuadrant(currentQuadrantId, title, comment); } document.getElementById('modal').style.display = 'none'; saveTasks(); renderTasks(); }; document.getElementById('cancelTaskBtn').onclick = () => { document.getElementById('modal').style.display = 'none'; }; document.getElementById('modal').onclick = (e) => { if (e.target === document.getElementById('modal')) { document.getElementById('modal').style.display = 'none'; } }; // Drag & Drop function allowDrop(e) { e.preventDefault(); } function drop(e) { e.preventDefault(); const dataStr = e.dataTransfer.getData('text/plain'); if (!dataStr) return; const data = JSON.parse(dataStr); const toQuad = e.currentTarget.closest('.quadrant').dataset.id; if (data.fromQuad === toQuad) return; const fromList = tasks[data.fromQuad]; const taskIndex = fromList.findIndex(t => t.id === data.taskId); if (taskIndex === -1) return; const task = fromList.splice(taskIndex, 1)[0]; if (!tasks[toQuad]) tasks[toQuad] = []; tasks[toQuad].push(task); saveTasks(); renderTasks(); } // Initial render renderTasks();
-</script> </body> </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Матрица Эйзенхауэра</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+<style>
+:root{
+--bg:#0d1020;
+--panel:#1b1f2e;
+--text:#f5f6fa;
+--muted:#9aa0b5;
+--accent:#6f7dff;
+}
+ 
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif;}
+ 
+body{
+min-height:100vh;
+background:
+linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
+var(--bg);
+background-size:40px 40px;
+color:var(--text);
+}
+ 
+header{
+text-align:center;
+padding:18px;
+font-size:26px;
+font-weight:700;
+color:var(--accent);
+}
+ 
+.board{padding:14px;display:grid;gap:12px;grid-template-columns:1fr 1fr;}
+.quadrant{
+position:relative;
+background:linear-gradient(180deg,#1e2334,#191d2b);
+border-radius:22px;
+padding:16px 18px 18px 22px;
+box-shadow:0 10px 24px rgba(0,0,0,.45);
+}
+.quadrant::before{
+content:'';
+position:absolute;left:0;top:0;bottom:0;width:5px;
+border-radius:22px 0 0 22px;
+}
+.q1::before{background:#ff6b6b;}
+.q2::before{background:#4dabff;}
+.q3::before{background:#ffd666;}
+.q4::before{background:#6ee7b7;}
+ 
+h2{font-size:14px;font-weight:600;margin-bottom:10px;}
+.tasks{
+display:flex;
+flex-direction:column;
+gap:8px;
+min-height:40px;
+}
+ 
+.task{
+padding:10px 12px;
+border-radius:12px;
+font-size:13px;
+cursor:pointer;
+transition:.25s;
+user-select:none;
+}
+.task.q1{background:#ff6b6b;}
+.task.q2{background:#4dabff;}
+.task.q3{background:#ffd666;color:#222;}
+.task.q4{background:#6ee7b7;color:#222;}
+.task small{display:block;font-size:11px;opacity:.75;margin-top:4px;}
+ 
+.task.done{
+opacity:.35;
+text-decoration:line-through;
+filter:grayscale(1);
+}
+ 
+.pomodoro{
+margin:14px;
+padding:18px;
+background:linear-gradient(180deg,#1e2334,#191d2b);
+border-radius:22px;
+}
+.timer{text-align:center;font-size:44px;font-weight:700;margin:16px 0;}
+.pomo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label{font-size:12px;color:var(--muted);}
+input{
+width:100%;padding:10px 12px;border-radius:12px;
+border:none;background:#0f1324;color:white;
+}
+.mode-buttons,.buttons{
+display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;
+}
+.buttons{grid-template-columns:1fr 1fr 1fr;}
+button{
+padding:12px;border-radius:14px;border:none;
+font-weight:600;cursor:pointer;color:white;
+}
+.primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
+.secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
+button.active{outline:2px solid var(--accent);}
+ 
+/* MODAL */
+#modal{
+display:none;
+position:fixed;
+top:0;left:0;right:0;bottom:0;
+background:rgba(0,0,0,0.7);
+z-index:100;
+justify-content:center;
+align-items:center;
+}
+#modalContent{
+background:var(--panel);
+padding:20px;
+border-radius:16px;
+width:90%;
+max-width:400px;
+color:var(--text);
+}
+#modal h3{margin-bottom:12px;}
+#modal input, #modal textarea{
+width:100%;
+padding:10px;
+margin-bottom:12px;
+border-radius:10px;
+background:#0f1324;
+color:white;
+border:none;
+}
+#modal button{
+width:100%;
+margin-top:8px;
+}
+</style>
+</head>
+ 
+<body>
+ 
+<header>Матрица Эйзенхауэра</header>
+ 
+<div class="board">
+<div class="quadrant q1" data-id="q1"><h2>Важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+<div class="quadrant q2" data-id="q2"><h2>Важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+<div class="quadrant q3" data-id="q3"><h2>Не важно · Срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+<div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+</div>
+ 
+<div class="pomodoro">
+<div class="pomo-grid">
+<div><label>Работа (мин)</label><input id="workInput" type="number" value="25"></div>
+<div><label>Отдых (мин)</label><input id="breakInput" type="number" value="5"></div>
+</div>
+ 
+<div id="timer" class="timer">25:00</div>
+ 
+<div class="mode-buttons">
+<button id="workBtn" class="secondary active">Работа</button>
+<button id="breakBtn" class="secondary">Отдых</button>
+</div>
+ 
+<div class="buttons">
+<button id="startBtn" class="primary">Старт</button>
+<button id="pauseBtn" class="secondary">Пауза</button>
+<button id="resetBtn" class="secondary">Сбросить</button>
+</div>
+</div>
+ 
+<!-- Modal -->
+<div id="modal">
+<div id="modalContent">
+<h3 id="modalTitle">Новая задача</h3>
+<input type="text" id="taskTitle" placeholder="Название задачи">
+<textarea id="taskComment" placeholder="Комментарий (необязательно)" rows="3"></textarea>
+<button id="saveTaskBtn" class="primary">Сохранить</button>
+<button id="cancelTaskBtn" class="secondary">Отмена</button>
+</div>
+</div>
+ 
+<script>
+// ===== NOTIFICATIONS & SOUND =====
+if ("Notification" in window && Notification.permission === "default") {
+Notification.requestPermission();
+}
+ 
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+ 
+function playSound(){
+const o = audioCtx.createOscillator();
+const g = audioCtx.createGain();
+o.frequency.value = 880;
+g.gain.value = 0.12;
+o.connect(g); g.connect(audioCtx.destination);
+o.start();
+o.stop(audioCtx.currentTime + 0.3);
+}
+ 
+function playFinishSound(times = 3, interval = 450){
+let count = 0;
+const id = setInterval(() => {
+playSound();
+count++;
+if(count >= times) clearInterval(id);
+}, interval);
+}
+ 
+// ===== TIMER =====
+let mode='work';
+let duration=25*60000;
+let endTime=null;
+let raf=null;
+let finished=false;
+ 
+function format(ms){
+ms=Math.max(0,ms);
+const s=Math.floor(ms/1000);
+return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+}
+ 
+function notify(){
+playFinishSound(3);
+if(Notification.permission==="granted"){
+new Notification("⏰ Таймер завершён",{
+body: mode==='work' ? "Пора отдыхать" : "Пора работать"
+});
+}
+}
+ 
+function tick(){
+const left=endTime-Date.now();
+timer.textContent=format(left);
+if(left<=0 && !finished){
+finished=true;
+notify();
+cancelAnimationFrame(raf);
+raf=null;
+} else if(left>0){
+raf=requestAnimationFrame(tick);
+}
+}
+ 
+function start(){
+if(raf)return;
+audioCtx.resume();
+finished=false;
+endTime=Date.now()+duration;
+tick();
+}
+ 
+function pause(){
+if(!raf)return;
+duration=endTime-Date.now();
+cancelAnimationFrame(raf);
+raf=null;
+}
+ 
+function reset(){
+pause();
+finished=false;
+duration=(mode==='work'?parseInt(workInput.value)||25:parseInt(breakInput.value)||5)*60000;
+timer.textContent=format(duration);
+}
+ 
+function setMode(m){
+mode=m;
+reset();
+workBtn.classList.toggle('active',m==='work');
+breakBtn.classList.toggle('active',m==='break');
+}
+ 
+document.getElementById('startBtn').onclick=start;
+document.getElementById('pauseBtn').onclick=pause;
+document.getElementById('resetBtn').onclick=reset;
+document.getElementById('workBtn').onclick=()=>setMode('work');
+document.getElementById('breakBtn').onclick=()=>setMode('break');
+ 
+reset();
+ 
+// ===== TASKS SYSTEM =====
+let currentQuadrantId = null;
+let editingTaskId = null;
+let tasks = JSON.parse(localStorage.getItem('eisenhowerTasks')) || {};
+ 
+function saveTasks() {
+localStorage.setItem('eisenhowerTasks', JSON.stringify(tasks));
+}
+ 
+function renderTasks() {
+document.querySelectorAll('.tasks').forEach(el => el.innerHTML = '');
+for (const [quadId, taskList] of Object.entries(tasks)) {
+const container = document.querySelector(.quadrant[data-id="${quadId}"] .tasks);
+if (!container) continue;
+taskList.forEach(task => {
+const el = document.createElement('div');
+el.className = task ${quadId};
+el.draggable = true;
+el.dataset.id = task.id;
+el.innerHTML =
+${task.title}
+${task.comment ? <small>${task.comment}</small> : ''}
+;
+el.ondragstart = (e) => {
+e.dataTransfer.setData('text/plain', JSON.stringify({ taskId: task.id, fromQuad: quadId }));
+};
+el.onclick = () => {
+el.classList.toggle('done');
+task.done = el.classList.contains('done');
+saveTasks();
+};
+el.ondblclick = (e) => {
+e.stopPropagation();
+editTask(quadId, task.id);
+};
+container.appendChild(el);
+});
+}
+}
+ 
+function addTaskToQuadrant(quadId, title, comment = '') {
+if (!tasks[quadId]) tasks[quadId] = [];
+const newTask = {
+id: Date.now().toString(),
+title,
+comment,
+done: false
+};
+tasks[quadId].push(newTask);
+saveTasks();
+renderTasks();
+}
+ 
+function editTask(quadId, taskId) {
+const task = tasks[quadId].find(t => t.id === taskId);
+if (!task) return;
+ 
+editingTaskId = taskId;
+currentQuadrantId = quadId;
+ 
+document.getElementById('modalTitle').textContent = 'Редактировать задачу';
+document.getElementById('taskTitle').value = task.title;
+document.getElementById('taskComment').value = task.comment || '';
+document.getElementById('modal').style.display = 'flex';
+}
+ 
+// Назначаем обработчики кликов по квадрантам
+document.querySelectorAll('.quadrant').forEach(quadrant => {
+const tasksContainer = quadrant.querySelector('.tasks');
+tasksContainer.addEventListener('click', (e) => {
+// Если кликнули на задачу — ничего не делаем (обработка в renderTasks)
+if (e.target.closest('.task')) return;
+// Иначе — открываем модалку для добавления
+currentQuadrantId = quadrant.dataset.id;
+editingTaskId = null;
+document.getElementById('modalTitle').textContent = 'Новая задача';
+document.getElementById('taskTitle').value = '';
+document.getElementById('taskComment').value = '';
+document.getElementById('modal').style.display = 'flex';
+});
+});
+ 
+document.getElementById('saveTaskBtn').onclick = () => {
+const title = document.getElementById('taskTitle').value.trim();
+const comment = document.getElementById('taskComment').value.trim();
+if (!title) {
+alert('Введите название задачи');
+return;
+}
+ 
+if (editingTaskId) {
+const task = tasks[currentQuadrantId].find(t => t.id === editingTaskId);
+if (task) {
+task.title = title;
+task.comment = comment;
+}
+} else {
+addTaskToQuadrant(currentQuadrantId, title, comment);
+}
+ 
+document.getElementById('modal').style.display = 'none';
+saveTasks();
+renderTasks();
+};
+ 
+document.getElementById('cancelTaskBtn').onclick = () => {
+document.getElementById('modal').style.display = 'none';
+};
+ 
+document.getElementById('modal').onclick = (e) => {
+if (e.target === document.getElementById('modal')) {
+document.getElementById('modal').style.display = 'none';
+}
+};
+ 
+// Drag & Drop
+function allowDrop(e) {
+e.preventDefault();
+}
+ 
+function drop(e) {
+e.preventDefault();
+const dataStr = e.dataTransfer.getData('text/plain');
+if (!dataStr) return;
+const data = JSON.parse(dataStr);
+const toQuad = e.currentTarget.closest('.quadrant').dataset.id;
+ 
+if (data.fromQuad === toQuad) return;
+ 
+const fromList = tasks[data.fromQuad];
+const taskIndex = fromList.findIndex(t => t.id === data.taskId);
+if (taskIndex === -1) return;
+ 
+const task = fromList.splice(taskIndex, 1)[0];
+if (!tasks[toQuad]) tasks[toQuad] = [];
+tasks[toQuad].push(task);
+ 
+saveTasks();
+renderTasks();
+}
+ 
+// Initial render
+renderTasks();
+</script>
+ 
+</body>
+</html>
