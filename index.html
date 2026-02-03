@@ -35,6 +35,7 @@ header{
   color:var(--accent);
 }
 
+/* === MATRIX === */
 .board{
   padding:14px;
   display:grid;
@@ -47,12 +48,11 @@ header{
 }
 
 .quadrant{
-  position:relative;
   background:linear-gradient(180deg,#1e2334,#191d2b);
   border-radius:22px;
   padding:16px 18px 18px 22px;
-  box-shadow:0 10px 24px rgba(0,0,0,.45);
   min-height:160px;
+  position:relative;
 }
 
 .quadrant::before{
@@ -67,7 +67,7 @@ header{
 .q3::before{background:#ffd666;}
 .q4::before{background:#6ee7b7;}
 
-h2{font-size:14px;font-weight:600;margin-bottom:10px;}
+h2{font-size:14px;margin-bottom:10px;}
 
 .tasks{
   display:flex;
@@ -80,7 +80,6 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   border-radius:12px;
   font-size:13px;
   cursor:pointer;
-  user-select:none;
 }
 
 .task.q1{background:#ff6b6b;}
@@ -89,9 +88,8 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
 .task.q4{background:#6ee7b7;color:#222;}
 
 .task.done{
-  opacity:.35;
+  opacity:.4;
   text-decoration:line-through;
-  filter:grayscale(1);
 }
 
 .task small{
@@ -101,13 +99,45 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   margin-top:4px;
 }
 
-/* MODAL */
+/* === POMODORO === */
+.pomodoro{
+  margin:14px;
+  padding:18px;
+  background:linear-gradient(180deg,#1e2334,#191d2b);
+  border-radius:22px;
+}
+
+.timer{
+  text-align:center;
+  font-size:44px;
+  font-weight:700;
+  margin:16px 0;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+}
+
+button{
+  padding:12px;
+  border-radius:14px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  color:white;
+}
+
+.primary{background:#6f7dff;}
+.secondary{background:#4a4f6a;}
+
+/* === MODAL === */
 #modal{
   display:none;
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.7);
-  z-index:100;
   justify-content:center;
   align-items:center;
 }
@@ -125,22 +155,10 @@ h2{font-size:14px;font-weight:600;margin-bottom:10px;}
   padding:10px;
   margin-bottom:12px;
   border-radius:10px;
+  border:none;
   background:#0f1324;
   color:white;
-  border:none;
 }
-
-button{
-  padding:12px;
-  border-radius:14px;
-  border:none;
-  font-weight:600;
-  cursor:pointer;
-  color:white;
-}
-
-.primary{background:linear-gradient(135deg,#6f7dff,#7f8cff);}
-.secondary{background:linear-gradient(135deg,#4a4f6a,#5c6280);}
 </style>
 </head>
 
@@ -155,129 +173,116 @@ button{
   <div class="quadrant q4" data-id="q4"><h2>Не важно · Не срочно</h2><div class="tasks"></div></div>
 </div>
 
+<div class="pomodoro">
+  <div id="timer" class="timer">25:00</div>
+  <div class="controls">
+    <button id="start" class="primary">Старт</button>
+    <button id="pause" class="secondary">Пауза</button>
+    <button id="reset" class="secondary">Сброс</button>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div id="modal">
   <div id="modalContent">
     <h3 id="modalTitle">Новая задача</h3>
     <input id="taskTitle" placeholder="Название задачи">
     <textarea id="taskComment" rows="3" placeholder="Комментарий"></textarea>
-    <button id="saveTaskBtn" class="primary">Сохранить</button>
-    <button id="cancelTaskBtn" class="secondary">Отмена</button>
+    <button id="saveTask" class="primary">Сохранить</button>
+    <button id="cancelTask" class="secondary">Отмена</button>
   </div>
 </div>
 
 <script>
-/* ===== DOM ===== */
-const modal = document.getElementById('modal');
-const modalTitle = document.getElementById('modalTitle');
-const taskTitle = document.getElementById('taskTitle');
-const taskComment = document.getElementById('taskComment');
-const saveTaskBtn = document.getElementById('saveTaskBtn');
-const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+/* ===== TIMER ===== */
+let duration = 25 * 60;
+let interval = null;
+const timerEl = document.getElementById('timer');
 
-/* ===== DATA ===== */
-let tasks = JSON.parse(localStorage.getItem('eisenhowerTasks')) || {};
-let currentQuadrantId = null;
-let editingTaskId = null;
-
-function saveTasks(){
-  localStorage.setItem('eisenhowerTasks', JSON.stringify(tasks));
+function renderTime(){
+  const m = String(Math.floor(duration/60)).padStart(2,'0');
+  const s = String(duration%60).padStart(2,'0');
+  timerEl.textContent = `${m}:${s}`;
 }
 
-function renderTasks(){
+document.getElementById('start').onclick = ()=>{
+  if(interval) return;
+  interval = setInterval(()=>{
+    if(duration<=0){
+      clearInterval(interval);
+      interval=null;
+      return;
+    }
+    duration--;
+    renderTime();
+  },1000);
+};
+
+document.getElementById('pause').onclick = ()=>{
+  clearInterval(interval);
+  interval=null;
+};
+
+document.getElementById('reset').onclick = ()=>{
+  clearInterval(interval);
+  interval=null;
+  duration=25*60;
+  renderTime();
+};
+
+renderTime();
+
+/* ===== TASKS ===== */
+const modal = document.getElementById('modal');
+const taskTitle = document.getElementById('taskTitle');
+const taskComment = document.getElementById('taskComment');
+let currentQuadrant = null;
+
+let tasks = JSON.parse(localStorage.getItem('tasks')) || {};
+
+function save(){localStorage.setItem('tasks',JSON.stringify(tasks));}
+
+function render(){
   document.querySelectorAll('.tasks').forEach(t=>t.innerHTML='');
-
-  for(const [qid,list] of Object.entries(tasks)){
-    const container = document.querySelector(`.quadrant[data-id="${qid}"] .tasks`);
-    if(!container) continue;
-
-    list.forEach(task=>{
-      const el = document.createElement('div');
-      el.className = `task ${qid}` + (task.done?' done':'');
-      el.draggable = true;
-      el.innerHTML = task.title + (task.comment?`<small>${task.comment}</small>`:'');
-
-      el.onclick = ()=>{task.done=!task.done;saveTasks();renderTasks();};
-      el.ondblclick = e=>{e.stopPropagation();openEdit(qid,task.id);};
-
-      el.ondragstart = e=>{
-        e.dataTransfer.setData('text/plain', JSON.stringify({id:task.id,from:qid}));
-      };
-
-      container.appendChild(el);
+  for(const q in tasks){
+    const box=document.querySelector(`.quadrant[data-id="${q}"] .tasks`);
+    tasks[q].forEach(t=>{
+      const el=document.createElement('div');
+      el.className=`task ${q}`+(t.done?' done':'');
+      el.innerHTML=t.title+(t.comment?`<small>${t.comment}</small>`:'');
+      el.onclick=()=>{t.done=!t.done;save();render();}
+      box.appendChild(el);
     });
   }
 }
 
-function openEdit(qid,id){
-  const t = tasks[qid].find(x=>x.id===id);
-  currentQuadrantId=qid;
-  editingTaskId=id;
-  modalTitle.textContent='Редактировать задачу';
-  taskTitle.value=t.title;
-  taskComment.value=t.comment||'';
-  modal.style.display='flex';
-}
-
-/* ===== ADD ===== */
 document.querySelectorAll('.quadrant').forEach(q=>{
-  q.querySelector('.tasks').onclick = e=>{
+  q.onclick=e=>{
     if(e.target.closest('.task')) return;
-    currentQuadrantId=q.dataset.id;
-    editingTaskId=null;
-    modalTitle.textContent='Новая задача';
+    currentQuadrant=q.dataset.id;
     taskTitle.value='';
     taskComment.value='';
     modal.style.display='flex';
   };
 });
 
-saveTaskBtn.onclick=()=>{
-  const title = taskTitle.value.trim();
-  if(!title) return alert('Введите название');
-
-  if(editingTaskId){
-    const t = tasks[currentQuadrantId].find(x=>x.id===editingTaskId);
-    t.title=title;
-    t.comment=taskComment.value;
-  }else{
-    tasks[currentQuadrantId] ??= [];
-    tasks[currentQuadrantId].push({
-      id:Date.now().toString(),
-      title,
-      comment:taskComment.value,
-      done:false
-    });
-  }
-
+document.getElementById('saveTask').onclick=()=>{
+  if(!taskTitle.value.trim()) return;
+  tasks[currentQuadrant] ??= [];
+  tasks[currentQuadrant].push({
+    title:taskTitle.value,
+    comment:taskComment.value,
+    done:false
+  });
+  save();
+  render();
   modal.style.display='none';
-  saveTasks();
-  renderTasks();
 };
 
-cancelTaskBtn.onclick=()=>modal.style.display='none';
+document.getElementById('cancelTask').onclick=()=>modal.style.display='none';
 modal.onclick=e=>{if(e.target===modal)modal.style.display='none';};
 
-/* ===== DRAG ===== */
-document.querySelectorAll('.tasks').forEach(t=>{
-  t.ondragover=e=>e.preventDefault();
-  t.ondrop=e=>{
-    e.preventDefault();
-    const d=JSON.parse(e.dataTransfer.getData('text/plain'));
-    const to=e.currentTarget.closest('.quadrant').dataset.id;
-    if(d.from===to) return;
-
-    const fromList=tasks[d.from];
-    const idx=fromList.findIndex(x=>x.id===d.id);
-    const task=fromList.splice(idx,1)[0];
-    tasks[to]??=[];
-    tasks[to].push(task);
-    saveTasks();
-    renderTasks();
-  };
-});
-
-renderTasks();
+render();
 </script>
 
 </body>
